@@ -1,10 +1,10 @@
 # Odoo Mapbox GL JS Integration
 
 [![Odoo 19.0](https://img.shields.io/badge/Odoo-19.0-875A7B?logo=odoo&logoColor=white)](https://www.odoo.com/)
-[![pre-commit](https://github.com/mithnusa/odoo-mapbox/actions/workflows/pre-commit.yml/badge.svg?branch=19.0)](https://github.com/mithnusa/odoo-mapbox/actions/workflows/pre-commit.yml)
-[![Coverage Insights](https://github.com/mithnusa/odoo-mapbox/actions/workflows/coverage.yml/badge.svg?branch=19.0)](https://github.com/mithnusa/odoo-mapbox/actions/workflows/coverage.yml?query=branch%3A19.0)
-[![codecov](https://codecov.io/gh/mithnusa/odoo-mapbox/branch/19.0/graph/badge.svg)](https://codecov.io/gh/mithnusa/odoo-mapbox)
+[![pre-commit](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/pre-commit.yml/badge.svg?branch=19.0)](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/pre-commit.yml)
+[![Coverage Insights](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/coverage.yml/badge.svg?branch=19.0)](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/coverage.yml?query=branch%3A19.0)
 [![Mapbox GL JS](https://img.shields.io/badge/Mapbox_GL_JS-v3.33.0-000000?logo=mapbox&logoColor=white)](https://docs.mapbox.com/mapbox-gl-js/api/)
+[![Turf.js](https://img.shields.io/badge/Turf.js-v7.4.0-6ED0F0)](https://turfjs.org/)
 [![License: LGPL-3](https://img.shields.io/badge/License-LGPL_3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
 A suite of Odoo 19.0 addons that brings interactive Mapbox GL JS maps to Odoo — a reusable map view framework (GeoJSON shapes and lat/lng coordinates), a GeoJSON drawing widget for form fields, a reachable-area (isochrone) building block, and the application modules that consume them: Contacts, Project/Task, portal address pinpointing, and a standalone Route Planner app.
