@@ -1,0 +1,41 @@
+// Matches the standard 29 × 29 px Mapbox ctrl button footprint.
+.o_mapbox_globe_toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #333;
+    transition: background-color 100ms ease;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &.active {
+        color: #007bff;
+    }
+
+    &.disabled,
+    &:disabled {
+        cursor: not-allowed;
+        opacity: 0.4;
+    }
+}
+
+// Crossfades the map canvas around a user-triggered globe/Mercator swap so the
+// projection change doesn't visually "pop". Class names are toggled from
+// mapbox_globe_toggle_control.js.
+@media (prefers-reduced-motion: no-preference) {
+    .o_mapbox_projection_transition_host {
+        transition: opacity 260ms ease;
+
+        &.o_mapbox_projection_fade_out {
+            opacity: 0.15;
+        }
+    }
+}

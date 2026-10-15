@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="project_mapbox_gl.RecordItem" t-inherit="web_view_base_mapbox_gl.RecordItem" t-inherit-mode="primary">
+        <xpath expr="//button[@id='open-record']" position="before">
+            <button
+                type="button"
+                class="btn btn-sm btn-link"
+                id="action-view-task"
+                data-tooltip="View Tasks"
+                t-on-click="() => props.onActionViewTask(record)"
+            >
+                <i class="fa fa-list-ul" />
+            </button>
+        </xpath>
+    </t>
+</templates>

@@ -1,0 +1,91 @@
+.o_mapboxgl_renderer {
+    .o_mapbox_sidebar {
+        position: relative;
+        height: 100%;
+        background-color: $o-view-background-color;
+        z-index: 1;
+        width: 25%;
+        max-width: 400px;
+        border-right: var(--ControlPanel-border-bottom, #{$o-control-panel-border-bottom});
+        overflow-y: auto;
+        overflow-x: hidden;
+
+        button[data-bs-toggle="collapse"] {
+            .fa-caret-down {
+                display: block;
+            }
+            .fa-caret-right {
+                display: none;
+            }
+            &.collapsed {
+                .fa-caret-down {
+                    display: none;
+                }
+                .fa-caret-right {
+                    display: block;
+                }
+            }
+        }
+
+        // Table fills sidebar; action column shrinks to its buttons, content column takes the rest
+        table {
+            width: 100%;
+
+            tr td:last-child {
+                white-space: nowrap; // shrinks action column to button content width
+            }
+
+            tr td.o_sidebar_content_cell {
+                width: 100%; // grabs all remaining space in auto layout
+                max-width: 0; // prevents cell from demanding minimum width from content
+                overflow: hidden;
+
+                > .d-flex {
+                    width: 100%;
+                    overflow: hidden;
+                }
+            }
+        }
+
+        table tr td {
+            .o_map_sidebar_record, .o_map_sidebar_group {
+                flex: 1;
+                min-width: 0;
+                overflow: hidden;
+
+                > div {
+                    display: block;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+            }
+        }
+
+        .o_field_widget {
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .o_map_sidebar {
+            span {
+                &.text-muted {
+                    @include font-size($font-size-sm);
+                }
+                &.title {
+                    @include o-kanban-record-title($font-size: 14px);
+                }
+            }
+            table tr td {
+                vertical-align: middle;
+            }
+        }
+
+        // Responsive: hide sidebar on small screens and mobile devices
+        @media (max-width: 768px) {
+            display: none !important;
+        }
+    }
+}

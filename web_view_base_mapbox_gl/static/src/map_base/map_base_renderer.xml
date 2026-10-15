@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="web_view_base_mapbox_gl.BaseMapboxGlRenderer">
+        <div class="o_mapboxgl_renderer">
+            <div class="o_mapbox_sidebar">
+                <Sidebar t-props="sidebarProps" />
+            </div>
+            <div class="o_mapboxgl_view" id="o_mapboxgl_view" t-ref="map" />
+            <div class="o_mapboxgl_view_startpoint" t-if="!mapboxState.isMapReady">
+                <t t-if="mapboxState.isCheckingConnection">
+                    <i class="fa fa-spinner fa-spin me-2" />
+                    <span>Checking connection...</span>
+                </t>
+                <t t-elif="mapboxState.isInternetConnected === false">
+                    <div class="text-center">
+                        <i class="fa fa-wifi text-danger d-block mb-2" style="font-size: 2rem;" />
+                        <span class="d-block mb-2">No internet connection</span>
+                        <button class="btn btn-sm btn-primary" t-on-click="retryConnection">
+                            <i class="fa fa-refresh me-1" />
+                            Retry
+                        </button>
+                    </div>
+                </t>
+                <t t-else="">
+                    <i class="fa fa-spinner fa-spin me-2" />
+                    <span>Loading map...</span>
+                </t>
+            </div>
+            <Search t-if="mapboxState.isMapReady" />
+        </div>
+    </t>
+    <t t-name="web_view_base_mapbox_gl.PopupContent">
+        <div class="mapbox-popup-content mt-2" style="min-width: 250px;">
+            <div class="popup-header" t-attf-style="padding-left: 4px; margin-bottom: 4px">
+                <div>
+                    <h4 class="m-0">
+                        <t t-out="data.title || 'Feature'" />
+                    </h4>
+                    <t t-if="data.subTitle">
+                        <p style="margin: 4px 0; font-size: 12px;">
+                            <t t-out="data.subTitle" />
+                        </p>
+                    </t>
+                </div>
+            </div>
+            <div
+                class="popup-measurements"
+                t-if="measurements"
+                style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #ecf0f1;"
+            >
+                <div class="mt-1 ms-1">
+                    <ul class="list-unstyled mb-2">
+                        <t t-foreach="measurements" t-as="measurement" t-key="measurementIndex">
+                            <li style="font-size: 12px;">
+                                <span class="text-muted" t-out="measurement" />
+                            </li>
+                        </t>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="popup-actions d-flex justify-content-between"
+                style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #ecf0f1;"
+            >
+                <span style="color: #95a5a6; font-size: 11px;">
+                    <i class="fa fa-hand-pointer-o" />
+                    Click to view details
+                </span>
+                <span style="color: #7f8c8d; text-transform: uppercase;font-size: 11px;">
+                    <span t-out="geometryType" />
+                </span>
+            </div>
+            <!-- Show more original properties -->
+            <div class="popup-more-properties mt-2" t-if="originalProperties">
+                <div
+                    class="properties-list"
+                    style="max-height: 150px; overflow-y: auto; margin-top: 6px; padding-top: 6px; border-top: 1px solid #ecf0f1;"
+                >
+                    <t t-foreach="Object.entries(originalProperties)" t-as="entry" t-key="entryIndex">
+                        <div class="d-flex justify-content-between mb-1 text-muted" style="font-size: 11px;">
+                            <span t-out="entry[0] + ':' " />
+                            <span t-out="entry[1]?.toString()" />
+                        </div>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="0">
+    <record id="route_type_route" model="route.type">
+        <field name="name">Route</field>
+        <field name="departure_title">Departure</field>
+        <field name="route_color" eval="1" />
+        <field name="vehicle_required" eval="True" />
+        <field name="driver_required" eval="True" />
+        <field name="departure_date_required" eval="True" />
+        <field name="default_service_duration" eval="0.25" />
+        <field name="ir_sequence_id" ref="route_planner.seq_route_planner" />
+    </record>
+</odoo>

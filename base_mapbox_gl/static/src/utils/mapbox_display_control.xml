@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="base_mapbox_gl.MapboxDisplayControl">
+        <div class="o_mapbox_style_switcher" t-att-data-current-style="currentStyle">
+            <div class="o_mapbox_style_switcher_header">
+                <button type="button" class="o_mapbox_style_switcher_toggle btn btn-sm" title="Change map style">
+                    <i class="fa fa-paint-brush" />
+                </button>
+            </div>
+            <div class="o_mapbox_style_switcher_content" style="display: none;">
+                <div class="o_mapbox_style_options" t-if="styles">
+                    <t t-foreach="styles" t-as="style" t-key="style_index">
+                        <button
+                            type="button"
+                            t-attf-class="o_mapbox_style_option btn btn-sm {{ currentStyle === style.key || currentStyle === style.url ? 'btn-primary' : 'btn-outline-secondary' }}"
+                            t-att-data-style-key="style.key"
+                            t-att-title="style.description"
+                        >
+                            <i t-att-class="style.icon" />
+                            <span t-esc="style.label" />
+                        </button>
+                    </t>
+                </div>
+                <div class="o_mapbox_display_options">
+                    <div class="o_mapbox_style_config_group o_mapbox_checkbox_group">
+                        <label for="mapbox_show_labels" class="o_mapbox_checkbox_label">
+                            <input
+                                type="checkbox"
+                                id="mapbox_show_labels"
+                                class="o_mapbox_show_labels"
+                                t-attf-checked="#{ showLabels ? 'checked' : undefined }"
+                                t-attf-disabled="#{ isOsmStyle ? 'disabled' : undefined }"
+                            />
+                            Show Map Labels
+                        </label>
+                    </div>
+                    <div class="o_mapbox_style_config_group o_mapbox_checkbox_group">
+                        <label for="mapbox_show_3d_features" class="o_mapbox_checkbox_label">
+                            <input
+                                type="checkbox"
+                                id="mapbox_show_3d_features"
+                                class="o_mapbox_show_3d_features"
+                                t-attf-checked="#{ show3dFeatures ? 'checked' : undefined }"
+                                t-attf-disabled="#{ isStandardBaseStyle ? undefined : 'disabled' }"
+                            />
+                            Show 3D Features
+                        </label>
+                    </div>
+                </div>
+                <div
+                    class="o_mapbox_style_config"
+                    t-attf-style="#{ isStandardStyle ? 'display: block;' : 'display: none;' }"
+                >
+                    <div class="o_mapbox_style_config_group">
+                        <label for="mapbox_light_preset" class="o_mapbox_style_config_label">Lighting</label>
+                        <select id="mapbox_light_preset" class="form-select form-select-sm o_mapbox_light_preset">
+                            <option
+                                value="dawn"
+                                t-attf-selected="#{ currentLightPreset === 'dawn' ? 'selected' : undefined }"
+                            >
+                                Dawn
+                            </option>
+                            <option
+                                value="day"
+                                t-attf-selected="#{ currentLightPreset === 'day' ? 'selected' : undefined }"
+                            >
+                                Day
+                            </option>
+                            <option
+                                value="dusk"
+                                t-attf-selected="#{ currentLightPreset === 'dusk' ? 'selected' : undefined }"
+                            >
+                                Dusk
+                            </option>
+                            <option
+                                value="night"
+                                t-attf-selected="#{ currentLightPreset === 'night' ? 'selected' : undefined }"
+                            >
+                                Night
+                            </option>
+                        </select>
+                    </div>
+                    <div class="o_mapbox_style_config_group">
+                        <label for="mapbox_theme" class="o_mapbox_style_config_label">Theme</label>
+                        <select id="mapbox_theme" class="form-select form-select-sm o_mapbox_theme">
+                            <option
+                                value="default"
+                                t-attf-selected="#{ currentTheme === 'default' ? 'selected' : undefined }"
+                            >
+                                Default
+                            </option>
+                            <option
+                                value="faded"
+                                t-attf-selected="#{ currentTheme === 'faded' ? 'selected' : undefined }"
+                            >
+                                Faded
+                            </option>
+                            <option
+                                value="monochrome"
+                                t-attf-selected="#{ currentTheme === 'monochrome' ? 'selected' : undefined }"
+                            >
+                                Monochrome
+                            </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="o_mapbox_language_config" t-if="languageSupported">
+                    <div class="o_mapbox_language_config_group">
+                        <label for="mapbox_language" class="o_mapbox_style_config_label">Language</label>
+                        <select id="mapbox_language" class="form-select form-select-sm o_mapbox_language_preset">
+                            <t t-foreach="languageSupported" t-as="lang" t-key="lang.code">
+                                <option
+                                    t-att-value="lang.code"
+                                    t-esc="lang.title"
+                                    t-attf-selected="#{ currentLanguage === lang.code ? 'selected' : undefined }"
+                                />
+                            </t>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

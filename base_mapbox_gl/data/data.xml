@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="geoprovider_mapbox" model="base.geo_provider">
+        <field name="tech_name">mapbox</field>
+        <field name="name">Mapbox</field>
+    </record>
+</odoo>

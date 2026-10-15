@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="website_portal_pinpoint_address_mapbox_gl.MapboxPinpointAddressDialog">
+        <Dialog size="'xl'" title="props.title" modalRef="modalRef">
+            <div class="d-flex flex-column flex-grow-1 overflow-hidden">
+                <div class="mb-2">
+                    <div class="alert alert-info text-center mb-0 p-2" role="alert">
+                        <span class="fa fa-info-circle fa-fw" aria-hidden="true" />
+                        <span>Drag and drop the marker to update the location</span>
+                    </div>
+                </div>
+                <div class="flex-grow-1 overflow-hidden rounded border">
+                    <div class="mapbox-gl-map h-100" t-ref="mapboxRef" />
+                </div>
+            </div>
+            <t t-set-slot="footer">
+                <button class="btn btn-primary" t-on-click="onConfirm" data-hotkey="s">Save</button>
+                <button class="btn" t-on-click="props.close" data-hotkey="q">Discard</button>
+            </t>
+        </Dialog>
+    </t>
+</templates>

@@ -1,0 +1,22 @@
+// Matches the standard 29×29 px Mapbox ctrl button footprint.
+.o_mapbox_terrain_toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    color: #333;
+    transition: background-color 100ms ease;
+
+    &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &.active {
+        color: #007bff;
+    }
+}

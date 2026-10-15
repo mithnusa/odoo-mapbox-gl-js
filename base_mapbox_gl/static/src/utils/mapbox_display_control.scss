@@ -1,0 +1,182 @@
+// Neutralize mapboxgl-ctrl-group wrapper so the switcher controls its own visuals.
+// overflow: visible is critical — mapboxgl-ctrl-group has overflow: hidden by default,
+// which clips our expanded panel to the toggle button's width.
+.mapboxgl-ctrl-group:has(.o_mapbox_style_switcher) {
+    background: transparent !important;
+    overflow: visible !important;
+    height: fit-content !important;
+    width: fit-content !important;
+}
+
+.o_mapbox_style_switcher {
+    background: light-dark(rgba(255, 255, 255, 0.9), rgba(50, 50, 50, 0.9));
+    border-radius: inherit;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+    font-family: inherit;
+}
+
+// Expand to full width only when the content panel is open
+.o_mapbox_style_switcher:has(.o_mapbox_style_switcher_content:not([style*="display: none"])) {
+    width: 300px;
+}
+
+.o_mapbox_style_switcher_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: inherit;
+    // padding: 4px;
+}
+
+.o_mapbox_style_switcher_title {
+    font-weight: 600;
+    font-size: 12px;
+    color: light-dark(#495057, #adb5bd);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.o_mapbox_style_switcher_toggle {
+    // border: none;
+    background: transparent;
+    padding: 4px 6px;
+    border-radius: 4px;
+    transition: all 200ms ease;
+}
+
+.o_mapbox_style_switcher_content {
+    padding: 12px;
+    animation: slideDown 200ms ease-out;
+    max-height: 350px;
+    overflow-y: auto;
+}
+
+.o_mapbox_style_options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.mapboxgl-ctrl-group .o_mapbox_style_option {
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100% !important;
+    height: auto !important;
+    padding: 12px 8px;
+    border-radius: 6px !important;
+    transition: all 200ms ease;
+    min-height: 60px;
+    font-size: 11px;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+    background: light-dark(rgba(255, 255, 255, 0.8), rgba(50, 50, 50, 0.8));
+    cursor: pointer;
+    overflow: visible !important;
+    box-sizing: border-box;
+}
+
+.mapboxgl-ctrl-group .o_mapbox_style_option:hover {
+    transform: translateY(-1px);
+    color: light-dark(#007bff, #66b2ff);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: light-dark(#007bff, #66b2ff);
+}
+
+.mapboxgl-ctrl-group .o_mapbox_style_option.btn-primary {
+    background-color: #007bff !important;
+    border-color: #007bff !important;
+    color: white !important;
+}
+
+.mapboxgl-ctrl-group .o_mapbox_style_option i {
+    font-size: 18px;
+    margin-bottom: 4px;
+}
+
+.mapboxgl-ctrl-group .o_mapbox_style_option span {
+    text-align: center;
+    line-height: 1.2;
+}
+
+.o_mapbox_display_options, .o_mapbox_style_config, .o_mapbox_language_config {
+    border-top: 1px solid light-dark(#e9ecef, #495057);
+    padding-top: 12px;
+    margin-bottom: 12px;
+}
+
+.o_mapbox_checkbox_group {
+    display: flex;
+}
+
+.o_mapbox_checkbox_label {
+    display: flex !important;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+
+    &:has(input[type="checkbox"]:disabled) {
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+}
+
+.o_mapbox_style_config_group {
+    margin-bottom: 12px;
+}
+
+.o_mapbox_style_config_group:last-child {
+    margin-bottom: 0;
+}
+
+.o_mapbox_style_config_label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: light-dark(#495057, #adb5bd);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.o_mapbox_style_config .form-select, .o_mapbox_language_config .form-select {
+    font-size: 12px;
+    padding: 4px 6px;
+    height: auto;
+    border-radius: 4px;
+    border: 1px solid light-dark(#dee2e6, #495057);
+    background-color: light-dark(#ffffff, #2b2b3b);
+    color: light-dark(#212529, #dee2e6);
+    width: 100%;
+}
+
+.o_mapbox_style_config .form-select:focus, .o_mapbox_language_config .form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 768px) {
+
+    .o_mapbox_style_switcher_content {
+        padding: 8px;
+    }
+
+    .o_mapbox_style_option {
+        padding: 8px 6px;
+        min-height: 50px;
+        font-size: 10px;
+    }
+}

@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t
+        t-name="contacts_mapbox_gl.RecordItemAvatar"
+        t-inherit="web_view_base_mapbox_gl.RecordItem"
+        t-inherit-mode="primary"
+    >
+        <xpath expr="//div[hasclass('o_map_sidebar_record')]" position="attributes">
+            <attribute name="class" add="with_avatar" separator=" " />
+        </xpath>
+        <xpath expr="//div[hasclass('o_map_sidebar_record')]" position="before">
+            <t t-set="avatar_url" t-value="this.getAvatarUrl(record)" />
+            <div class="d-inline-block position-relative opacity-trigger-hover">
+                <img
+                    loading="lazy"
+                    t-att-src="avatar_url"
+                    class="img img-fluid o_avatar rounded"
+                    alt="Avatar"
+                    height="24"
+                    width="24"
+                    style="max-height: 24px; max-width: 24px;"
+                />
+            </div>
+        </xpath>
+    </t>
+</templates>

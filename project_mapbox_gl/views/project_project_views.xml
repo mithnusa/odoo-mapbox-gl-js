@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_project_project_mapbox_gl_geojson" model="ir.ui.view">
+        <field name="name">view.project.project.mapbox_gl.geojson</field>
+        <field name="model">project.project</field>
+        <field name="arch" type="xml">
+            <mapbox_gl
+                js_class="mapbox_gl_draw_project"
+                string="Site"
+                geojson_field="mapbox_geojson"
+                color_field="mapbox_color"
+                title_field="name"
+                description_field="partner_id"
+            >
+                <field name="name" />
+                <field name="partner_id" />
+                <field name="mapbox_geojson" />
+                <field name="mapbox_color" />
+            </mapbox_gl>
+        </field>
+    </record>
+    <record id="view_project_project_mapbox_gl_form" model="ir.ui.view">
+        <field name="name">view.project.project.mapbox_gl.form</field>
+        <field name="model">project.project</field>
+        <field name="inherit_id" ref="project.edit_project" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[1]" position="after">
+                <page string="Site">
+                    <field
+                        name="mapbox_geojson"
+                        widget="mapbox_gl_draw_geojson"
+                        options="{'default_center': [106.82703162885998, -6.175664127601439], 'field_area': 'mapbox_area'}"
+                    />
+                    <group>
+                        <group>
+                            <label for="mapbox_area" />
+                            <div>
+                                <field name="mapbox_area" class="oe_inline" nolabel="1" />
+                                <span>m</span>
+                                <sup>2</sup>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="mapbox_color" widget="color_picker" />
+                        </group>
+                    </group>
+                    <separator string="Description" />
+                    <field name="mapbox_notes" widget="html" />
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

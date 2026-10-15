@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!--
+    Appends the "mapbox_gl" view mode to standard Project and Task window
+    actions. Declared in a data file (not a post_init_hook) so that it is
+    re-applied on every module update, surviving project module upgrades.
+-->
+<odoo>
+    <!-- Project actions -->
+    <record id="project.open_view_project_all" model="ir.actions.act_window">
+        <field
+            name="view_mode"
+            model="ir.actions.act_window"
+            eval="','.join(dict.fromkeys(obj(ref('project.open_view_project_all')).view_mode.split(',') + ['mapbox_gl']))"
+        />
+    </record>
+
+    <record id="project.open_view_project_all_group_stage" model="ir.actions.act_window">
+        <field
+            name="view_mode"
+            model="ir.actions.act_window"
+            eval="','.join(dict.fromkeys(obj(ref('project.open_view_project_all_group_stage')).view_mode.split(',') + ['mapbox_gl']))"
+        />
+    </record>
+
+    <record id="project.open_view_project_all_config" model="ir.actions.act_window">
+        <field
+            name="view_mode"
+            model="ir.actions.act_window"
+            eval="','.join(dict.fromkeys(obj(ref('project.open_view_project_all_config')).view_mode.split(',') + ['mapbox_gl']))"
+        />
+    </record>
+
+    <record id="project.open_view_project_all_config_group_stage" model="ir.actions.act_window">
+        <field
+            name="view_mode"
+            model="ir.actions.act_window"
+            eval="','.join(dict.fromkeys(obj(ref('project.open_view_project_all_config_group_stage')).view_mode.split(',') + ['mapbox_gl']))"
+        />
+    </record>
+
+    <!-- Task actions -->
+    <record id="project.act_project_project_2_project_task_all" model="ir.actions.act_window">
+        <field
+            name="view_mode"
+            model="ir.actions.act_window"
+            eval="','.join(dict.fromkeys(obj(ref('project.act_project_project_2_project_task_all')).view_mode.split(',') + ['mapbox_gl']))"
+        />
+    </record>
+
+    <record id="project.action_view_all_task" model="ir.actions.act_window">
+        <field
+            name="view_mode"
+            model="ir.actions.act_window"
+            eval="','.join(dict.fromkeys(obj(ref('project.action_view_all_task')).view_mode.split(',') + ['mapbox_gl']))"
+        />
+    </record>
+
+    <record id="project.action_view_my_task" model="ir.actions.act_window">
+        <field
+            name="view_mode"
+            model="ir.actions.act_window"
+            eval="','.join(dict.fromkeys(obj(ref('project.action_view_my_task')).view_mode.split(',') + ['mapbox_gl']))"
+        />
+    </record>
+</odoo>

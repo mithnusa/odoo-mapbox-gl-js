@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t
+        t-name="contacts_mapbox_gl.PopupContent"
+        t-inherit="web_view_mapbox_gl_geolocate.PopupContent"
+        t-inherit-mode="primary"
+    >
+        <xpath expr="//h4/.." position="before">
+            <aside class="o_kanban_record_image me-2 flex-shrink-0" t-if="avatarUrl">
+                <div class="position-relative w-100 h-auto m-0">
+                    <div name="avatar_128" class="o_field_widget o_readonly_modifier o_field_image h-100">
+                        <div class="d-inline-block position-relative opacity-trigger-hover">
+                            <img
+                                loading="lazy"
+                                class="img img-fluid object-fit-contain"
+                                alt="Contact image"
+                                width="64"
+                                height="64"
+                                t-att-src="avatarUrl"
+                                name="avatar_128"
+                            />
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </xpath>
+        <xpath expr="//div[hasclass('popup-header')]" position="attributes">
+            <attribute name="class" add="d-flex align-items-start" separator=" " />
+        </xpath>
+    </t>
+</templates>

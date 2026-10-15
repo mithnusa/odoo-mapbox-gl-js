@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_route_planner_user,access_route_planner_user,model_route_planner,route_planner.group_route_planner_user,1,1,1,1
+access_route_planner_line_user,access_route_planner_line_user,model_route_planner_line,route_planner.group_route_planner_user,1,1,1,1
+access_route_planner_user_fleet_vehicle,access_route_planner_user_fleet_vehicle,fleet.model_fleet_vehicle,route_planner.group_route_planner_user,1,0,0,0
+access_route_type_user,access_route_type_user,model_route_type,route_planner.group_route_planner_user,1,0,0,0
+access_route_type_manager,access_route_type_manager,model_route_type,route_planner.group_route_planner_manager,1,1,1,1

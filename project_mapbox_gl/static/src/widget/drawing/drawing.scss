@@ -1,0 +1,64 @@
+.o_field_mapbox_gl_draw_geojson_project_task {
+    width: 100%;
+    .o_mapboxgl_renderer {
+        min-height: 650px;
+        margin-bottom: 1rem;
+        position: relative; // For complexity banner positioning
+
+        .o_mapboxgl_view_widget {
+            border: 1px solid $o-view-background-color;
+        }
+
+        .o_mapboxgl_view + .o_mapboxgl_view_startpoint {
+            left: 50%;
+        }
+
+        .animation-flash-highlight {
+            -webkit-animation: flash-highlight 1500ms infinite;
+            -moz-animation: flash-highlight 1500ms infinite;
+            -o-animation: flash-highlight 1500ms infinite;
+            animation: flash-highlight 1500ms infinite;
+
+            span {
+                color: white;
+            }
+        }
+
+        @-webkit-keyframes flash-highlight {
+            0% { background-color: #b22020; -webkit-box-shadow: 0 0 3px #b22020; }
+            50% { background-color: #ff4444; -webkit-box-shadow: 0 0 40px #ff4444; }
+            100% { background-color: #b22020; -webkit-box-shadow: 0 0 3px #b22020; }
+        }
+
+        @-moz-keyframes flash-highlight {
+            0% { background-color: #b22020; -moz-box-shadow: 0 0 3px #b22020; }
+            50% { background-color: #ff4444; -moz-box-shadow: 0 0 40px #ff4444; }
+            100% { background-color: #b22020; -moz-box-shadow: 0 0 3px #b22020; }
+        }
+
+        @-o-keyframes flash-highlight {
+            0% { background-color: #b22020; box-shadow: 0 0 3px #b22020; }
+            50% { background-color: #ff4444; box-shadow: 0 0 40px #ff4444; }
+            100% { background-color: #b22020; box-shadow: 0 0 3px #b22020; }
+        }
+
+        @keyframes flash-highlight {
+            0% { background-color: #b22020; box-shadow: 0 0 3px #b22020; }
+            50% { background-color: #ff4444; box-shadow: 0 0 40px #ff4444; }
+            100% { background-color: #b22020; box-shadow: 0 0 3px #b22020; }
+        }
+    }
+}
+
+.o_dialog {
+    .o_field_mapbox_gl_draw_geojson_project_task {
+        width: 100%;
+        .o_mapboxgl_renderer {
+            z-index: 2;
+            min-height: 550px;
+            .o_mapboxgl_view + .o_mapboxgl_view_startpoint {
+                left: 50%;
+            }
+        }
+    }
+}

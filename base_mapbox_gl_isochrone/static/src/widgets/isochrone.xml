@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <div t-name="base_mapbox_gl_isochrone.GeoJsonIsochroneField">
+        <div class="o_mapboxgl_renderer">
+            <div class="o_mapboxgl_view border rounded-2" id="o_mapboxgl_view_widget_geojson_isochrone" t-ref="map" />
+            <div class="o_mapboxgl_view_startpoint" t-if="!mapboxState.isMapReady">
+                <t t-if="mapboxState.isCheckingConnection">
+                    <i class="fa fa-spinner fa-spin me-2" />
+                    <span>Checking connection...</span>
+                </t>
+                <t t-elif="mapboxState.isInternetConnected === false">
+                    <div class="text-center">
+                        <i class="fa fa-wifi text-danger d-block mb-2" style="font-size: 2rem;" />
+                        <span class="d-block mb-2">No internet connection</span>
+                        <button class="btn btn-sm btn-primary" t-on-click="retryConnection">
+                            <i class="fa fa-refresh me-1" />
+                            Retry
+                        </button>
+                    </div>
+                </t>
+                <t t-else="">
+                    <i class="fa fa-spinner fa-spin me-2" />
+                    <span>Loading map...</span>
+                </t>
+            </div>
+            <Search t-if="mapboxState.isMapLoaded" />
+        </div>
+        <div t-if="isochroneArea" class="o_mapboxgl_isochrone_area my-1 smaller text-700">
+            <p class="mb-0">
+                <span>Coverage area:</span>
+                <span class="ms-1" t-out="isochroneArea.metric" />
+                <span class="mx-1">|</span>
+                <span t-out="isochroneArea.imperial" />
+            </p>
+            <p class="mb-1" t-if="isochroneReach">
+                <span>Reaches up to</span>
+                <span class="ms-1" t-out="isochroneReach.metric" />
+                <span class="mx-1">|</span>
+                <span t-out="isochroneReach.imperial" />
+            </p>
+        </div>
+    </div>
+</templates>

@@ -1,0 +1,76 @@
+.o_dialog .o_mapboxgl_view {
+    z-index: 999;
+    min-height: 500px;
+}
+
+.o_mapboxgl_renderer, .o_dialog .o_mapboxgl_renderer  {
+    display: flex;
+    align-content: stretch;
+    overflow-x: hidden;
+    height: 100%;
+    position: relative;
+
+.o_mapboxgl_view {
+        width: 100%;
+        will-change: transform;
+
+
+        .mapboxgl-popup {
+            .mapboxgl-popup-content {
+                border-radius: 4px;
+                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+                background-color: light-dark(rgba(255, 255, 255, 0.95), rgba(38, 37, 37, 1));
+                color: light-dark(#000, #fff);
+            }
+        }
+
+        .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+            border-bottom-color: light-dark(rgba(255, 255, 255, 0.95), rgba(38, 37, 37, 1)) !important;
+        }
+
+        .mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip {
+            border-top-color: light-dark(rgba(255, 255, 255, 0.95), rgba(38, 37, 37, 1)) !important;
+        }
+
+        .mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip {
+            border-top-color: light-dark(rgba(255, 255, 255, 0.95), rgba(38, 37, 37, 1)) !important;
+        }
+
+        .mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+            border-top-color: light-dark(rgba(255, 255, 255, 0.95), rgba(38, 37, 37, 1)) !important;
+        }
+
+        .mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+            border-right-color: light-dark(rgba(255, 255, 255, 0.95), rgba(38, 37, 37, 1)) !important;
+        }
+
+        .mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+            border-left-color: light-dark(rgba(255, 255, 255, 0.95), rgba(38, 37, 37, 1)) !important;
+        }
+
+        .mapbox_draw {
+            background: rgba(56, 135, 190, 0.1);
+            border: 2px solid #3887be;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+        }
+    }
+}
+
+.o_mapboxgl_view + .o_mapboxgl_view_startpoint {
+    position: absolute;
+    top: 50%;
+    // Center over the map area (skipping the sidebar: width 25%, max 400px)
+    // left = 50% of renderer + half of sidebar = 50% + min(12.5%, 200px)
+    left: calc(50% + min(12.5%, 200px));
+    transform: translate(-50%, -50%);
+    background-color: light-dark(rgba(255, 255, 255, 0.8), rgba(38, 37, 37, 0.8));
+    padding: 10px 20px;
+    font-size: 16px;
+    color: light-dark(rgba(38, 37, 37, 0.8), rgba(255, 255, 255, 0.8));
+    border-radius: 4px;
+    z-index: 9999;
+}

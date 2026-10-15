@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t t-name="web_view_base_mapbox_gl.BaseMapView">
+        <div t-att-class="className" t-ref="root">
+            <Layout className="model.useSampleModel ? 'o_view_sample_data' : ''" display="display">
+                <t t-set-slot="control-panel-create-button">
+                    <t t-if="!model.root.editedRecord and activeActions.create and !env.inDialog">
+                        <button
+                            type="button"
+                            class="btn btn-primary o_list_button_add"
+                            data-hotkey="c"
+                            t-on-click="onClickCreate"
+                            data-bounce-button=""
+                        >
+                            New
+                        </button>
+                    </t>
+                </t>
+                <t t-set-slot="layout-buttons">
+                    <t t-call="{{ props.buttonTemplate }}" />
+                </t>
+                <t t-set-slot="control-panel-always-buttons">
+                    <t
+                        t-foreach="archInfo.headerButtons"
+                        t-as="button"
+                        t-key="button.id"
+                        t-if="!evalViewModifier(button.invisible)"
+                    >
+                        <MultiRecordViewButton
+                            t-if="button.display === 'always'"
+                            list="model.root"
+                            className="button.className"
+                            clickParams="button.clickParams"
+                            defaultRank="'btn-secondary'"
+                            domain="props.domain"
+                            icon="button.icon"
+                            string="button.string"
+                            title="button.title"
+                            attrs="button.attrs"
+                        />
+                    </t>
+                </t>
+                <t t-set-slot="layout-actions">
+                    <SearchBar t-if="searchBarToggler.state.showSearchBar" autofocus="firstLoad" />
+                </t>
+                <t t-set-slot="control-panel-navigation-additional">
+                    <t t-component="searchBarToggler.component" t-props="searchBarToggler.props" />
+                </t>
+                <t t-set-slot="control-panel-additional-actions">
+                    <CogMenu t-if="!hasSelectedRecords" />
+                </t>
+                <t t-set-slot="control-panel-selection-actions">
+                    <div t-if="hasSelectedRecords" class="d-flex gap-1">
+                        <SelectionBox root="this.model.root" />
+                        <t t-if="props.info.actionMenus">
+                            <ActionMenus t-props="actionMenuProps" />
+                        </t>
+                    </div>
+                </t>
+                <t t-component="props.Renderer" t-props="rendererProps" />
+            </Layout>
+        </div>
+    </t>
+    <t t-name="web_view_base_mapbox_gl.BaseMapView.Buttons">
+        <div
+            t-if="props.showButtons"
+            class="o_list_buttons d-flex gap-1 d-empty-none align-items-baseline"
+            role="toolbar"
+            aria-label="Main actions"
+        >
+            <button
+                type="button"
+                class="btn btn-outline-secondary o-mapbox_gl-button-center-map"
+                t-on-click="centerMap"
+            >
+                Center Map
+            </button>
+        </div>
+    </t>
+</templates>

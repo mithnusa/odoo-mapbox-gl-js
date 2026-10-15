@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_fleet_vehicle_list_simplified_readonly" model="ir.ui.view">
+        <field name="name">fleet.vehicle.list.simplified</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="arch" type="xml">
+            <list string="Fleet Vehicles" create="false" delete="false" edit="false">
+                <field name="active" column_invisible="True" />
+                <field name="license_plate" />
+                <field name="model_id" />
+                <field name="driver_id" />
+                <field name="category_id" />
+                <field name="vin_sn" readonly="1" optional="hide" />
+                <field
+                    name="tag_ids"
+                    groups="route_planner.group_route_planner_manager"
+                    widget="many2many_tags"
+                    options="{'color_field': 'color'}"
+                    readonly="1"
+                />
+                <field name="state_id" widget="badge" readonly="1" optional="hide" />
+            </list>
+        </field>
+    </record>
+</odoo>

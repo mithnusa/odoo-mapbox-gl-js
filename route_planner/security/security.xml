@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo noupdate="1">
+    <record model="res.groups.privilege" id="res_groups_privilege_route_planner">
+        <field name="name">Route Planner</field>
+        <field name="category_id" ref="base.module_category_services" />
+    </record>
+
+    <!-- GROUPS -->
+    <!-- User -->
+    <record id="group_route_planner_user" model="res.groups">
+        <field name="name">User</field>
+        <field name="sequence">10</field>
+        <field name="privilege_id" ref="route_planner.res_groups_privilege_route_planner" />
+        <field name="implied_ids" eval="[(4, ref('base.group_user'))]" />
+    </record>
+    <!-- Manager -->
+    <record id="group_route_planner_manager" model="res.groups">
+        <field name="name">Administrator</field>
+        <field name="sequence">20</field>
+        <field name="privilege_id" ref="route_planner.res_groups_privilege_route_planner" />
+        <field name="implied_ids" eval="[(4, ref('route_planner.group_route_planner_user'))]" />
+        <field name="user_ids" eval="[(4, ref('base.user_root')), (4, ref('base.user_admin'))]" />
+    </record>
+
+    <!-- RULES -->
+    <!-- Users can only see their own routes -->
+    <!-- Users are not allowed to delete routes -->
+    <record id="route_planner_rule_user" model="ir.rule">
+        <field name="name">Route Planner: User</field>
+        <field name="model_id" ref="route_planner.model_route_planner" />
+        <field name="groups" eval="[(4, ref('route_planner.group_route_planner_user'))]" />
+        <field name="domain_force">[('company_id', 'in', company_ids + [False]), ('user_id', '=', user.id)]</field>
+        <field name="perm_unlink" eval="False" />
+    </record>
+    <record id="route_planner_stops_rule_user" model="ir.rule">
+        <field name="name">Route Planner Stops: User</field>
+        <field name="model_id" ref="route_planner.model_route_planner_line" />
+        <field name="groups" eval="[(4, ref('route_planner.group_route_planner_user'))]" />
+        <field name="domain_force">
+            [('company_id', 'in', company_ids + [False]), ('route_planner_id.user_id', '=', user.id)]
+        </field>
+        <field name="perm_unlink" eval="False" />
+    </record>
+    <!-- except when they are in draft state  -->
+    <record id="route_planner_rule_user_unlink" model="ir.rule">
+        <field name="name">Route Planner: User deletion restriction on non-draft route</field>
+        <field name="model_id" ref="route_planner.model_route_planner" />
+        <field name="groups" eval="[(4, ref('route_planner.group_route_planner_user'))]" />
+        <field name="domain_force">
+            [('company_id', 'in', company_ids + [False]), ('user_id', '=', user.id), ('state', '=', '99_draft')]
+        </field>
+        <field name="perm_unlink" eval="True" />
+    </record>
+    <record id="route_planner_stops_rule_user_unlink" model="ir.rule">
+        <field name="name">Route Planner Stops: User deletion restriction on non-draft route</field>
+        <field name="model_id" ref="route_planner.model_route_planner_line" />
+        <field name="groups" eval="[(4, ref('route_planner.group_route_planner_user'))]" />
+        <field name="domain_force">
+            [('company_id', 'in', company_ids + [False]), ('route_planner_id.user_id', '=', user.id), ('route_planner_id.state', '=', '99_draft')]
+        </field>
+        <field name="perm_unlink" eval="True" />
+    </record>
+
+    <!-- Managers have full access -->
+    <!-- Same as user: not allowed to delete non-draft routes -->
+    <record id="route_planner_rule_manager" model="ir.rule">
+        <field name="name">Route Planner: Admin</field>
+        <field name="model_id" ref="route_planner.model_route_planner" />
+        <field name="groups" eval="[(4, ref('route_planner.group_route_planner_manager'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_unlink" eval="False" />
+    </record>
+    <record id="route_planner_stops_rule_manager" model="ir.rule">
+        <field name="name">Route Planner Stops: Admin</field>
+        <field name="model_id" ref="route_planner.model_route_planner_line" />
+        <field name="groups" eval="[(4, ref('route_planner.group_route_planner_manager'))]" />
+        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="perm_unlink" eval="False" />
+    </record>
+    <!-- except when they are in draft state  -->
+    <record id="route_planner_rule_manager_unlink" model="ir.rule">
+        <field name="name">Route Planner: Manager deletion restriction on non-draft route</field>
+        <field name="model_id" ref="route_planner.model_route_planner" />
+        <field name="groups" eval="[(4, ref('route_planner.group_route_planner_manager'))]" />
+        <field name="domain_force">[('state', '=', '99_draft')]</field>
+        <field name="perm_unlink" eval="True" />
+    </record>
+    <record id="route_planner_stops_rule_manager_unlink" model="ir.rule">
+        <field name="name">Route Planner Stops: Manager deletion restriction on non-draft route</field>
+        <field name="model_id" ref="route_planner.model_route_planner_line" />
+        <field name="groups" eval="[(4, ref('route_planner.group_route_planner_manager'))]" />
+        <field name="domain_force">[('route_planner_id.state', '=', '99_draft')]</field>
+        <field name="perm_unlink" eval="True" />
+    </record>
+</odoo>

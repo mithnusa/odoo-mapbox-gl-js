@@ -1,0 +1,3 @@
+# QWeb templates with inline JS/CSS containing t-out expressions that
+# @prettier/plugin-xml cannot parse correctly as embedded content
+website_route_planner_mapbox_gl/views/templates.xml

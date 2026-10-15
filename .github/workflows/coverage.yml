@@ -1,0 +1,361 @@
+name: Code Coverage
+
+on:
+  push:
+    branches: ["19.0"]
+  pull_request:
+    branches: ["19.0"]
+
+permissions:
+  contents: read
+  code-quality: write
+
+jobs:
+  coverage:
+    name: Python Test Coverage
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: odoo
+          POSTGRES_PASSWORD: odoo
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U odoo -d postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends \
+            libldap2-dev libsasl2-dev libssl-dev postgresql-client
+
+      - name: Clone Odoo 19
+        run: |
+          git clone --depth=1 --branch=19.0 \
+            https://github.com/odoo/odoo.git /opt/odoo || { \
+            echo "ERROR: Failed to clone Odoo repository"; \
+            exit 1; \
+          }
+
+      - name: Cache pip packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-odoo19-${{ hashFiles('/opt/odoo/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-odoo19-
+
+      - name: Install Odoo and test dependencies
+        run: |
+          pip install -r /opt/odoo/requirements.txt
+          pip install -e /opt/odoo
+          pip install coverage websocket-client
+
+      - name: Wait for PostgreSQL
+        env:
+          PGPASSWORD: odoo
+        run: |
+          until pg_isready -h 127.0.0.1 -p 5432 -U odoo -d postgres; do
+            echo "Waiting for PostgreSQL..."
+            sleep 2
+          done
+
+      - name: Run tests with coverage
+        env:
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          set -euo pipefail
+
+          # Discover addons that exist in this repository
+          mapfile -t modules < <(
+            find . -mindepth 1 -maxdepth 1 -type d \
+              -exec test -f "{}/__manifest__.py" ';' -print \
+              | sed 's|^\./||' \
+              | sort -u
+          )
+
+          if [[ ${#modules[@]} -eq 0 ]]; then
+            echo "ERROR: No addon modules found in repository root."
+            exit 1
+          fi
+
+          echo "Discovered repository addons:"
+          printf '  %s\n' "${modules[@]}"
+          echo ""
+
+          # Symlink only repository addons into Odoo addons
+          install_modules=()
+          for module in "${modules[@]}"; do
+            TARGET="/opt/odoo/odoo/addons/$module"
+
+            if [[ -L "$TARGET" ]]; then
+              rm -f "$TARGET"
+            elif [[ -d "$TARGET" ]]; then
+              echo "WARNING: Module $module conflicts with Odoo builtin — skipping"
+              continue
+            fi
+
+            ln -sfn "$GITHUB_WORKSPACE/$module" "$TARGET"
+            install_modules+=("$module")
+            echo "Symlinked: $module"
+          done
+
+          if [[ ${#install_modules[@]} -eq 0 ]]; then
+            echo "ERROR: No repository addons could be symlinked into Odoo addons."
+            exit 1
+          fi
+
+          # Discover tests only inside repository addons
+          test_files=()
+          for module in "${install_modules[@]}"; do
+            if [[ -d "$module/tests" ]]; then
+              while IFS= read -r file; do
+                test_files+=("$file")
+              done < <(
+                find "$module/tests" -type f -name "test_*.py" \
+                  | sed 's|^\./||'
+              )
+            fi
+          done
+
+          if [[ ${#test_files[@]} -eq 0 ]]; then
+            echo "ERROR: No test files found in repository addons."
+            exit 1
+          fi
+
+          mapfile -t test_files < <(
+            printf '%s\n' "${test_files[@]}" | sort -u
+          )
+
+          echo "Discovered test files:"
+          printf '  %s\n' "${test_files[@]}"
+          echo ""
+
+          # Split tests:
+          # - pure unit tests: BaseCase-only suite that can run via unittest
+          # - Odoo/DB tests: TransactionCase or ORM-backed tests, run via odoo-bin
+          unit_test_modules=()
+          db_test_addons=()
+
+          for file in "${test_files[@]}"; do
+            module_path=$(echo "$file" | sed 's|\.py$||; s|/|.|g')
+            addon_name=${file%%/*}
+
+            if grep -Eq 'from odoo\.tests\.common import .*TransactionCase|SavepointCase|SingleTransactionCase|HttpCase' "$file"; then
+              db_test_addons+=("$addon_name")
+            elif grep -Eq 'self\.env\[|cls\.env\[|env\.ref\(' "$file"; then
+              db_test_addons+=("$addon_name")
+            else
+              unit_test_modules+=("odoo.addons.$module_path")
+            fi
+          done
+
+          if [[ ${#db_test_addons[@]} -gt 0 ]]; then
+            mapfile -t db_test_addons < <(
+              printf '%s\n' "${db_test_addons[@]}" | sort -u
+            )
+          fi
+
+          echo "Pure unit test modules:"
+          if [[ ${#unit_test_modules[@]} -gt 0 ]]; then
+            printf '  %s\n' "${unit_test_modules[@]}"
+          else
+            echo "  (none)"
+          fi
+          echo ""
+
+          echo "Database-backed Odoo test addons:"
+          if [[ ${#db_test_addons[@]} -gt 0 ]]; then
+            printf '  %s\n' "${db_test_addons[@]}"
+          else
+            echo "  (none)"
+          fi
+          echo ""
+
+          # Discover repository addons with a Hoot JS unit test suite
+          # (static/tests/**/*.test.js). These have no Python test_*.py file
+          # so they're absent from db_test_addons above. All repo addons get
+          # installed regardless (see below), which also covers loading
+          # their web.assets_unit_tests bundle — but WebSuite.test_unit_desktop's
+          # hoot id filter still needs to be scoped to this addon's own tag,
+          # not a hardcoded list.
+          #
+          # Hoot auto-tags every test with its owning addon's technical name
+          # (mirroring the "@web/core" style tags Odoo's own suites use), and
+          # that tag is inclusive of every test the addon contributes — there
+          # is no need to also single out individual test files by name.
+          # Scoping to @<module> (rather than the previous, more specific
+          # @<module>/<test file> guess) is what actually restricts a hoot
+          # run to this repo's own tests instead of falling through to
+          # running every installed module's tests, default Odoo ones
+          # included.
+          js_test_addons=()
+          hoot_tags=()
+          for module in "${install_modules[@]}"; do
+            if [[ -d "$module/static/tests" ]]; then
+              while IFS= read -r test_file; do
+                js_test_addons+=("$module")
+                suite_name=$(basename "$test_file" .test.js)
+                hoot_tags+=("/web:WebSuite.test_unit_desktop[@${module}/${suite_name}]")
+              done < <(find "$module/static/tests" -type f -name "*.test.js")
+            fi
+          done
+
+          mapfile -t js_test_addons < <(
+            printf '%s\n' "${js_test_addons[@]}" | sort -u
+          )
+
+          echo "JS (Hoot) test addons:"
+          if [[ ${#js_test_addons[@]} -gt 0 ]]; then
+            printf '  %s\n' "${js_test_addons[@]}"
+          else
+            echo "  (none)"
+          fi
+          echo ""
+
+          # Python imports modules via their symlink path (/opt/odoo/odoo/addons/<module>/...)
+          # so --source must point there to match what coverage actually tracks.
+          COVERAGE_SOURCES=$(printf '/opt/odoo/odoo/addons/%s,' "${install_modules[@]}")
+          COVERAGE_SOURCES="${COVERAGE_SOURCES%,}"
+          echo "Coverage scope: $COVERAGE_SOURCES"
+          echo ""
+
+          # Run pure unit tests first, if any
+          if [[ ${#unit_test_modules[@]} -gt 0 ]]; then
+            python -m coverage run \
+              --source="$COVERAGE_SOURCES" \
+              -m unittest \
+              "${unit_test_modules[@]}"
+          fi
+
+          # Install every repository addon (not just the ones with tests) so
+          # install-time issues — broken views, security XML, demo data,
+          # manifest errors — are caught across the whole suite. Test
+          # execution itself stays scoped to modules that actually have
+          # DB-backed or Hoot JS tests, via --test-tags: when neither exists,
+          # --test-enable/--test-tags are omitted entirely rather than passed
+          # empty, since an empty --test-tags value runs every default Odoo
+          # test too, not just this repo's.
+          ALL_MODULES=$(IFS=,; echo "${install_modules[*]}")
+
+          test_tag_parts=()
+          for addon in "${db_test_addons[@]}"; do
+            test_tag_parts+=("/$addon")
+          done
+          test_tag_parts+=("${hoot_tags[@]}")
+          TEST_TAGS=$(IFS=,; echo "${test_tag_parts[*]}")
+
+          echo "Installing: $ALL_MODULES"
+          echo "Running tests tagged: $TEST_TAGS"
+          echo ""
+
+          odoo_bin_args=(
+            /opt/odoo/odoo-bin
+            --addons-path="/opt/odoo/addons,/opt/odoo/odoo/addons,$GITHUB_WORKSPACE"
+            --db_host=127.0.0.1
+            --db_port=5432
+            --db_user=odoo
+            --db_password=odoo
+            -d odoo_test_ci
+            -i "$ALL_MODULES"
+            --without-demo=all
+          )
+
+          if [[ -n "$TEST_TAGS" ]]; then
+            odoo_bin_args+=(--test-enable --test-tags "$TEST_TAGS" --stop-after-init)
+            echo "Installing all repository addons, running tests tagged: $TEST_TAGS"
+          else
+            odoo_bin_args+=(--stop-after-init)
+            echo "Installing all repository addons (no DB-backed or JS tests found — Odoo test suite not run)"
+          fi
+          echo ""
+
+          python -m coverage run \
+            --append \
+            --source="$COVERAGE_SOURCES" \
+            "${odoo_bin_args[@]}"
+
+          # Generate XML directly from the collected coverage data.
+          # `coverage combine` fails when there is only a single data file.
+          python -m coverage xml -o coverage.xml
+
+      - name: Upload coverage report
+        if: success()
+        uses: actions/upload-code-coverage@v1
+        with:
+          file: coverage.xml
+          language: python
+          label: Python
+          fail-on-error: false
+
+      - name: Build coverage insights (no threshold)
+        if: success()
+        run: |
+          set -euo pipefail
+
+          # Human-readable per-file report in logs and as artifact.
+          python -m coverage report -m | tee coverage-report.txt
+
+          # HTML report for detailed drill-down by file and line.
+          python -m coverage html -d coverage_html
+
+          # Add concise summary to the GitHub Actions run summary.
+          python - <<'PY'
+          import os
+          import xml.etree.ElementTree as ET
+
+          root = ET.parse("coverage.xml").getroot()
+          total = float(root.attrib.get("line-rate", 0.0)) * 100
+
+          file_stats = []
+          for pkg in root.findall("./packages/package"):
+              for cls in pkg.findall("./classes/class"):
+                  filename = cls.attrib.get("filename", "")
+                  line_rate = float(cls.attrib.get("line-rate", 0.0)) * 100
+                  file_stats.append((line_rate, filename))
+
+          file_stats.sort(key=lambda item: item[0])
+          worst_files = file_stats[:15]
+
+          summary_path = os.environ.get("GITHUB_STEP_SUMMARY")
+          if not summary_path:
+              raise SystemExit(0)
+
+          with open(summary_path, "a", encoding="utf-8") as f:
+              f.write("## Coverage Insights\n")
+              f.write(f"- Total line coverage: **{total:.2f}%**\n")
+              f.write("- Coverage enforcement: **disabled**\n")
+              f.write("\n")
+              f.write("### Lowest-Coverage Files\n")
+              f.write("| File | Line Coverage |\n")
+              f.write("| --- | ---: |\n")
+              for rate, filename in worst_files:
+                  safe_name = filename.replace("|", "\\|")
+                  f.write(f"| {safe_name} | {rate:.2f}% |\n")
+          PY
+
+      - name: Upload detailed coverage artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-details
+          path: |
+            coverage.xml
+            coverage-report.txt
+            coverage_html/

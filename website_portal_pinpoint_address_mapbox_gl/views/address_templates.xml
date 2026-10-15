@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <template id="address_form_fields_pinpoint_address" inherit_id="portal.address_form_fields">
+        <xpath expr="//input[@name='csrf_token']" position="before">
+            <div class="col-lg-12 mt16 mb8 text-center mapbox_pinpoint_address" t-if="partner_full_address">
+                <t
+                    t-set="has_pinpoint_address"
+                    t-value="not (partner_sudo.partner_latitude == 0.0 and partner_sudo.partner_longitude == 0.0)"
+                />
+                <button
+                    type="button"
+                    t-attf-class="btn {{ 'btn-outline-success' if has_pinpoint_address else 'btn-outline-warning' }}"
+                    id="pinpoint_address"
+                    t-att-data-partner-id="partner_sudo.id"
+                    t-att-data-partner-latitude="partner_sudo.partner_latitude"
+                    t-att-data-partner-longitude="partner_sudo.partner_longitude"
+                    t-att-data-partner-full-address="partner_full_address"
+                    t-att-data-partner-simplified-address="partner_simplified_address"
+                >
+                    <i class="fa fa-map-marker fa-fw" aria-hidden="true" />
+                    <t t-if="has_pinpoint_address">
+                        <span>Update Location on Map</span>
+                    </t>
+                    <t t-else="">
+                        <span>Set Location on Map</span>
+                    </t>
+                </button>
+            </div>
+        </xpath>
+    </template>
+</odoo>

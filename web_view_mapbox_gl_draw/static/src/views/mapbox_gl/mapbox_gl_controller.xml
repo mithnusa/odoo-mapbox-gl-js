@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t
+        t-name="web_view_mapbox_gl_draw.MapboxGlView.Buttons"
+        t-inherit="web_view_base_mapbox_gl.BaseMapView.Buttons"
+        t-inherit-mode="primary"
+    >
+        <xpath expr="//div[@t-if='props.showButtons']" position="inside">
+            <button
+                type="button"
+                class="btn btn-outline-primary o-mapbox_gl-button-draw-shapes"
+                t-on-click="openGeoJSONUploadWizard"
+                data-bs-toggle="tooltip"
+                data-bs-placement="bottom"
+                title="Import GeoJSON file"
+            >
+                <i class="fa fa-upload" />
+                <span class="ps-1">GeoJSON</span>
+            </button>
+        </xpath>
+    </t>
+</templates>

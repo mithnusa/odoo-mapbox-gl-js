@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_project_task_mapbox_gl_geojson" model="ir.ui.view">
+        <field name="name">view.project.task.mapbox_gl.geojson</field>
+        <field name="model">project.task</field>
+        <field name="arch" type="xml">
+            <mapbox_gl
+                js_class="mapbox_gl_draw_project_task"
+                string="Site"
+                geojson_field="mapbox_geojson"
+                color_field="mapbox_color"
+                title_field="name"
+                description_field="project_id"
+            >
+                <field name="name" />
+                <field name="project_id" />
+                <field name="mapbox_geojson" />
+                <field name="mapbox_project_geojson" />
+                <field name="mapbox_project_area" />
+                <field name="mapbox_color" />
+            </mapbox_gl>
+        </field>
+    </record>
+    <record id="view_project_task_mapbox_gl_form" model="ir.ui.view">
+        <field name="name">project.task.mapbox_gl.form</field>
+        <field name="model">project.task</field>
+        <field name="inherit_id" ref="project.view_task_form2" />
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='extra_info']" position="after">
+                <page string="Site">
+                    <field name="mapbox_project_geojson" invisible="1" />
+                    <field
+                        name="mapbox_geojson"
+                        widget="mapbox_gl_draw_geojson_project_task"
+                        options="{'field_area': 'mapbox_area'}"
+                    />
+                    <group>
+                        <group>
+                            <label for="mapbox_project_area" />
+                            <div>
+                                <field name="mapbox_project_area" class="oe_inline" nolabel="1" readonly="1" />
+                                <span class="ms-1">m</span>
+                                <sup>2</sup>
+                            </div>
+                            <label for="mapbox_area" />
+                            <div>
+                                <field name="mapbox_area" class="oe_inline" nolabel="1" />
+                                <span>m</span>
+                                <sup>2</sup>
+                            </div>
+                        </group>
+                        <group>
+                            <field name="mapbox_color" widget="color_picker" />
+                        </group>
+                    </group>
+                    <separator string="Description" />
+                    <field name="mapbox_notes" widget="html" />
+                </page>
+            </xpath>
+        </field>
+    </record>
+</odoo>

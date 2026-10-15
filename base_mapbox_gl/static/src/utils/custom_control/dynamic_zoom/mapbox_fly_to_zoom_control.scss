@@ -1,0 +1,31 @@
+// Matches the standard 29 × 29 px Mapbox ctrl button footprint.
+.o_mapbox_fly_zoom {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 29px;
+    height: 29px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background-color 100ms ease;
+
+    &:hover:not(:disabled) {
+        background-color: rgba(0, 0, 0, 0.05);
+    }
+
+    &.disabled,
+    &:disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+}
+
+.o_mapbox_fly_zoom_icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #333;
+    user-select: none;
+}

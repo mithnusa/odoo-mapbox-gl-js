@@ -1,0 +1,133 @@
+/* Integrated custom controls styling for Mapbox Draw */
+
+/* Ensure custom buttons match the default draw control styling */
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_save,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_recalculate,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_cut,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_circle,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_rectangle,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_undo,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_redo,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_toggle-measurements,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_upload-geojson,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_download-geojson,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_add-label {
+    /* Inherit all default button styles from Mapbox Draw */
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: block;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    outline: none;
+    position: relative;
+    transition: background-color 0.15s;
+
+    /* Icon styling */
+    & > span {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 100%;
+        color: #404040;
+    }
+
+    /* SVG icon styling for cut button */
+    svg {
+        display: block;
+        margin: auto;
+    }
+}
+
+/* Hover states */
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_save:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_recalculate:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_cut:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_circle:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_rectangle:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_undo:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_redo:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_toggle-measurements:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_upload-geojson:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_download-geojson:hover,
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_add-label:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Active state for cut button */
+.mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_cut.active {
+    background-color: #40a0ff;
+
+    & > span,
+    & > span svg {
+        color: white;
+        stroke: white;
+    }
+}
+
+/* Disabled state */
+.mapbox-gl-draw_ctrl-draw-btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+.mapbox-gl-draw_ctrl-draw-btn:disabled:hover {
+    background-color: transparent;
+}
+
+/* Ensure proper spacing in the control group */
+.mapboxgl-ctrl-group .mapbox-gl-draw_ctrl-draw-btn {
+    border-top: 1px solid #ddd;
+}
+
+.mapboxgl-ctrl-group .mapbox-gl-draw_ctrl-draw-btn:first-child {
+    border-top: none;
+    border-radius: 4px 4px 0 0;
+}
+
+.mapboxgl-ctrl-group .mapbox-gl-draw_ctrl-draw-btn:last-child {
+    border-radius: 0 0 4px 4px;
+}
+
+.mapboxgl-ctrl-group .mapbox-gl-draw_ctrl-draw-btn:only-child {
+    border-radius: 4px;
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    .mapbox-gl-draw_ctrl-draw-btn > span {
+        color: #e0e0e0;
+    }
+
+    .mapbox-gl-draw_ctrl-draw-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .mapbox-gl-draw_ctrl-draw-btn {
+        border: 1px solid #000;
+    }
+
+    .mapbox-gl-draw_ctrl-draw-btn > span {
+        color: #000;
+    }
+
+    .mapbox-gl-draw_ctrl-draw-btn.active {
+        background-color: #000;
+
+        & > span,
+        & > span svg {
+            color: white;
+            stroke: white;
+        }
+    }
+}
+
+/* Map border highlight for unsaved changes */
+.mapboxgl-map.has-unsaved-changes {
+    border: 1.5px solid #ff4444 !important;
+}

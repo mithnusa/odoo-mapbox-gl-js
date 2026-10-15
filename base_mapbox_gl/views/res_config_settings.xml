@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="res_config_settings_view_form" model="ir.ui.view">
+        <field name="name">res.config.settings.view.form.inherit.base_mapbox_gl</field>
+        <field name="model">res.config.settings</field>
+        <field name="priority" eval="500" />
+        <field name="inherit_id" ref="base_setup.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <xpath expr="//block[@name='integration']" position="after">
+                <block name="base_mapbox_gl" title="Mapbox GL JS">
+                    <setting
+                        id="mapbox_gl_access_token_setting"
+                        help="Mapbox is a location data platform for mobile and web applications. To use Mapbox services, you need to sign up for an account and obtain an access token."
+                        documentation="https://docs.mapbox.com/help/getting-started/access-tokens/"
+                    >
+                        <field name="mapbox_gl_access_token" string="Access Token" />
+                    </setting>
+                    <setting id="mapbox_gl_language_setting" help="Set the map language">
+                        <field name="mapbox_gl_language" string="Language" />
+                    </setting>
+                    <setting
+                        id="mapbox_gl_style_url_setting"
+                        help="Set the default style for the map. Using preset style or add your own custom style URL"
+                        documentation="https://docs.mapbox.com/map-styles/standard/guides"
+                    >
+                        <field name="mapbox_gl_style" />
+                        <div class="content-group">
+                            <label for="mapbox_gl_style_url" string="Custom Style URL" />
+                            <field name="mapbox_gl_style_url" />
+                        </div>
+                    </setting>
+                    <setting
+                        id="mapbox_gl_lighting_setting"
+                        help="Set the default lighting conditions of the map"
+                        documentation="https://docs.mapbox.com/map-styles/standard/guides/#light-presets"
+                    >
+                        <field name="mapbox_gl_lighting" string="Lighting" />
+                    </setting>
+                    <setting
+                        id="mapbox_gl_theme_setting"
+                        help="Set the theme to change the look and feel of the map"
+                        documentation="https://docs.mapbox.com/map-styles/standard/guides/#theming"
+                    >
+                        <field name="mapbox_gl_theme" string="Theme" />
+                    </setting>
+                    <setting
+                        id="mapbox_gl_projection_setting"
+                        help="Set the map projection"
+                        documentation="https://docs.mapbox.com/mapbox-gl-js/guides/projections/"
+                    >
+                        <field
+                            name="mapbox_gl_projection"
+                            string="Projection"
+                            widget="radio"
+                            options="{'horizontal': true}"
+                        />
+                    </setting>
+                </block>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,401 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_route_planner_list" model="ir.ui.view">
+        <field name="name">view.route.planner.list</field>
+        <field name="model">route.planner</field>
+        <field name="arch" type="xml">
+            <list
+                string="Route Planner"
+                decoration-info="state == '02_confirmed'"
+                decoration-warning="state == '01_in_progress'"
+                decoration-danger="state == '04_cancelled'"
+                decoration-success="state == '03_done'"
+            >
+                <field name="name" />
+                <field name="origin_display_name" string="Source" optional="hide" />
+                <field name="route_type_id" optional="show" />
+                <field name="driver_id" widget="many2one_avatar" />
+                <field name="vehicle_id" optional="show" />
+                <field name="departure_id" optional="hide" />
+                <field name="state" />
+                <field name="total_stops" />
+                <field name="total_distance" sum="Total Distance" />
+                <field name="departure_date" widget="datetime" optional="hide" />
+                <field name="estimated_duration" widget="float_time" sum="Total Estimated Duration" />
+                <field name="total_service_duration" widget="float_time" sum="Total Service Duration" optional="show" />
+                <field name="arrival_date" widget="datetime" optional="show" />
+                <field name="user_id" optional="hide" widget="many2one_avatar_user" />
+                <field name="company_id" optional="hide" />
+                <field name="active" column_invisible="True" />
+                <field name="create_date" optional="hide" />
+            </list>
+        </field>
+    </record>
+
+    <record id="view_route_planner_form" model="ir.ui.view">
+        <field name="name">view.route.planner.form</field>
+        <field name="model">route.planner</field>
+        <field name="arch" type="xml">
+            <form string="Route Planner">
+                <field name="id" invisible="1" />
+                <header>
+                    <button
+                        name="action_confirm"
+                        type="object"
+                        string="Confirm"
+                        class="oe_highlight"
+                        invisible="state != '99_draft' or not route_line_ids"
+                    />
+                    <button
+                        name="action_cancel"
+                        type="object"
+                        string="Cancel"
+                        invisible="state not in ('02_confirmed', '01_in_progress')"
+                    />
+                    <button
+                        name="action_done"
+                        type="object"
+                        string="Done"
+                        class="oe_highlight"
+                        invisible="state != '01_in_progress'"
+                    />
+                    <button
+                        name="action_in_progress"
+                        type="object"
+                        string="Start Route"
+                        class="oe_highlight"
+                        invisible="state != '02_confirmed' or not route_line_ids"
+                    />
+                    <button
+                        name="action_draft"
+                        type="object"
+                        string="Set to Draft"
+                        invisible="state != '04_cancelled'"
+                        confirm="Are you sure you want to reset the route?"
+                    />
+                    <field name="state" widget="statusbar" statusbar_visible="99_draft,03_done" />
+                    <field name="active" invisible="1" />
+                    <field name="is_departure_geolocation_valid" invisible="1" />
+                    <field name="is_stops_geolocation_valid" invisible="1" />
+                </header>
+                <div
+                    class="alert alert-danger text-center"
+                    role="alert"
+                    invisible="is_departure_geolocation_valid or not departure_id or not id"
+                >
+                    <p class="mb-1">The departure location for this route is missing valid geolocation data.</p>
+                    <button
+                        type="object"
+                        class="btn btn-primary"
+                        name="action_get_departure_geolocation"
+                        string="Geolocate Departure"
+                    />
+                </div>
+                <div
+                    class="alert alert-danger text-center"
+                    role="alert"
+                    invisible="is_stops_geolocation_valid or not id"
+                >
+                    <p class="mb-1">One or more stops in this route are missing valid geolocation data.</p>
+                    <button
+                        type="object"
+                        class="btn btn-primary"
+                        name="action_get_stops_geolocation"
+                        string="Geolocate Stops"
+                    />
+                </div>
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Route Name" readonly="state != '99_draft'" />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="company_id" required="1" readonly="state != '99_draft'" />
+                            <field
+                                name="user_id"
+                                groups="route_planner.group_route_planner_manager"
+                                widget="many2one_avatar_user"
+                            />
+                        </group>
+                        <group>
+                            <field name="route_type_id" readonly="state != '99_draft'" />
+                            <field name="origin_display_name" readonly="1" />
+                        </group>
+                    </group>
+                    <group>
+                        <field name="description" readonly="state != '99_draft'" />
+                    </group>
+                    <group>
+                        <group string="Route Information" name="route_information">
+                            <field
+                                name="vehicle_id"
+                                context="{'list_view_ref': 'route_planner.view_fleet_vehicle_list_simplified_readonly'}"
+                                options="{'no_open': 1, 'no_create_edit': 1}"
+                                readonly="state != '99_draft'"
+                            />
+                            <field name="driver_id" readonly="state != '99_draft'" widget="many2one_avatar" />
+                            <field name="departure_date" readonly="state != '99_draft'" />
+                            <field
+                                name="departure_id"
+                                context="{'show_address': 1}"
+                                required="1"
+                                readonly="state != '99_draft'"
+                            />
+                            <field name="departure_address" readonly="1" invisible="1" />
+                            <field name="departure_latitude" invisible="1" />
+                            <field name="departure_longitude" invisible="1" />
+                            <field name="arrival_id" context="{'show_address': 1}" readonly="1" />
+                        </group>
+                        <group string="Route Summary" name="route_summary">
+                            <field name="arrival_date" widget="datetime" readonly="1" />
+                            <field name="total_distance" />
+                            <field name="estimated_duration" widget="float_time" />
+                            <field name="total_service_duration" widget="float_time" />
+                        </group>
+                    </group>
+                    <notebook>
+                        <page string="Stops" name="drop_off_points">
+                            <field name="route_line_ids" required="1" readonly="state != '99_draft'">
+                                <list editable="bottom">
+                                    <field name="stop_sequence" widget="handle" />
+                                    <field
+                                        name="stop_id"
+                                        context="{'show_address': 1}"
+                                        options="{'no_create': True, 'no_create_edit': True}"
+                                    />
+                                    <field name="stop_notes" />
+                                    <field name="notes" />
+                                    <field name="state" />
+                                    <field name="stop_latitude" column_invisible="1" />
+                                    <field name="stop_longitude" column_invisible="1" />
+                                    <field name="stop_address" column_invisible="1" />
+                                    <field name="distance_from_previous" sum="Total distance (km)" />
+                                    <field
+                                        name="duration_from_previous"
+                                        sum="Total duration (hours)"
+                                        widget="float_time"
+                                    />
+                                    <field
+                                        name="service_duration"
+                                        widget="float_time"
+                                        sum="Total service duration (hours)"
+                                    />
+                                </list>
+                                <form>
+                                    <header>
+                                        <field
+                                            name="state"
+                                            widget="statusbar"
+                                            statusbar_visible="00_none,01_arrived,04_done,03_cancell_or_skipped"
+                                        />
+                                    </header>
+                                    <group>
+                                        <group>
+                                            <field
+                                                name="stop_id"
+                                                context="{'show_address': 1}"
+                                                options="{'no_create': True, 'no_create_edit': True}"
+                                            />
+                                            <field name="stop_notes" />
+                                            <field name="notes" />
+                                        </group>
+                                        <group>
+                                            <field name="distance_from_previous" readonly="1" />
+                                            <label for="duration_from_previous" string="Duration from Previous" />
+                                            <div id="duration_from_previous">
+                                                <field
+                                                    name="duration_from_previous"
+                                                    class="oe_inline"
+                                                    nolabel="1"
+                                                    widget="float_time"
+                                                />
+                                            </div>
+                                            <label for="service_duration" string="Service Duration" />
+                                            <div id="service_duration">
+                                                <field
+                                                    name="service_duration"
+                                                    class="oe_inline"
+                                                    nolabel="1"
+                                                    widget="float_time"
+                                                />
+                                            </div>
+                                        </group>
+                                    </group>
+                                </form>
+                            </field>
+                        </page>
+                    </notebook>
+                </sheet>
+                <chatter />
+            </form>
+        </field>
+    </record>
+
+    <record id="view_route_planner_kanban" model="ir.ui.view">
+        <field name="name">view.route.planner.kanban</field>
+        <field name="model">route.planner</field>
+        <field name="arch" type="xml">
+            <kanban string="Route Planner">
+                <field name="name" />
+                <field name="route_type_id" />
+                <field name="driver_id" />
+                <field name="user_id" />
+                <field name="vehicle_id" />
+                <field name="departure_date" />
+                <field name="state" />
+                <field name="total_stops" />
+                <field name="total_distance" />
+                <field name="estimated_duration" />
+                <templates>
+                    <t t-name="card" class="flex-row gap-2">
+                        <aside>
+                            <div class="d-flex flex-column align-items-center gap-1">
+                                <field
+                                    name="driver_id"
+                                    widget="image"
+                                    options="{'preview_image': 'avatar_128', 'img_class': 'rounded-2 object-fit-contain'}"
+                                    class="o_image_64_cover"
+                                    alt="Driver"
+                                />
+                                <small
+                                    t-if="record.driver_id.raw_value"
+                                    t-out="record.driver_id.value"
+                                    class="smaller"
+                                />
+                                <small t-else="" class="text-muted smaller">Unasigned Driver</small>
+                            </div>
+                        </aside>
+                        <main class="ps-2 ps-md-0">
+                            <div class="d-flex">
+                                <field name="name" class="fw-bold fs-5" />
+                                <div class="ms-auto">
+                                    <field
+                                        name="state"
+                                        widget="badge"
+                                        decoration-info="state == '02_confirmed'"
+                                        decoration-warning="state == '01_in_progress'"
+                                        decoration-danger="state == '04_cancelled'"
+                                        decoration-success="state == '03_done'"
+                                    />
+                                </div>
+                            </div>
+                            <ul class="list-unstyled my-1">
+                                <li t-if="record.route_type_id.raw_value">
+                                    <span
+                                        class="badge bg-info-subtle"
+                                        t-out="record.route_type_id.value"
+                                        t-att-title="record.route_type_id.value"
+                                    />
+                                </li>
+                                <li t-if="record.departure_date.raw_value">
+                                    <div class="d-flex align-items-center">
+                                        <i
+                                            class="fa fa-calendar fa-fw text-primary"
+                                            title="Departure Date"
+                                            aria-label="Departure Date"
+                                        />
+                                        <field name="departure_date" widget="datetime" />
+                                    </div>
+                                </li>
+                                <li t-if="record.vehicle_id.raw_value">
+                                    <i class="fa fa-truck fa-fw text-primary" title="Vehicle" aria-label="Vehicle" />
+                                    <field name="vehicle_id" />
+                                </li>
+                            </ul>
+                            <div class="d-flex justify-content-between align-items-center mt-2 text-600">
+                                <div class="d-flex align-items-center">
+                                    <i class="fa fa-map-pin fa-fw text-primary" title="Stops" aria-label="Stops" />
+                                    <field name="total_stops" />
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i
+                                        class="fa fa-road fa-fw text-primary"
+                                        title="Approx. Distance"
+                                        aria-label="Approx. Distance"
+                                    />
+                                    <field name="total_distance" widget="float" options="{'precision': 2}" />
+                                    km
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <i
+                                        class="fa fa-clock-o fa-fw text-primary"
+                                        title="Est.duration"
+                                        aria-label="Est.duration"
+                                    />
+                                    <field name="estimated_duration" widget="float_time" />
+                                </div>
+                                <field name="user_id" widget="many2one_avatar_user" />
+                            </div>
+                        </main>
+                    </t>
+                </templates>
+            </kanban>
+        </field>
+    </record>
+
+    <record id="view_route_planner_search" model="ir.ui.view">
+        <field name="name">view.route.planner.search</field>
+        <field name="model">route.planner</field>
+        <field name="arch" type="xml">
+            <search string="Route Planner">
+                <field name="name" />
+                <field name="driver_id" />
+                <field name="vehicle_id" />
+                <field name="departure_id" />
+                <field name="route_type_id" />
+                <field name="origin_display_name" string="Source" />
+                <separator />
+                <filter string="Draft" name="draft" domain="[('state','=','99_draft')]" />
+                <filter string="Confirmed" name="confirmed" domain="[('state','=','02_confirmed')]" />
+                <filter string="In Progress" name="in_progress" domain="[('state','=','01_in_progress')]" />
+                <filter string="Done" name="done" domain="[('state','=','03_done')]" />
+                <filter string="Cancelled" name="cancelled" domain="[('state','=','04_cancelled')]" />
+                <separator />
+                <filter string="Archived" name="inactive" domain="[('active','=',False)]" />
+                <group>
+                    <filter string="State" name="state" context="{'group_by': 'state'}" />
+                    <filter string="Route" name="route" context="{'group_by': 'route_type_id'}" />
+                </group>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_route_planner_calendar" model="ir.ui.view">
+        <field name="name">view.route.planner.calendar</field>
+        <field name="model">route.planner</field>
+        <field name="arch" type="xml">
+            <calendar
+                string="Route Planner"
+                date_start="departure_date"
+                date_stop="arrival_date"
+                color="state"
+                mode="month"
+                scales="day,week,month,year"
+                create="0"
+                quick_create="0"
+            >
+                <field name="name" />
+                <field name="route_type_id" />
+                <field name="driver_id" />
+                <field name="vehicle_id" />
+                <field name="state" />
+                <field name="user_id" />
+            </calendar>
+        </field>
+    </record>
+
+    <record id="action_route_planner" model="ir.actions.act_window">
+        <field name="name">Route Planner</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">route.planner</field>
+        <field name="view_mode">list,kanban,calendar,form</field>
+        <field name="search_view_id" ref="view_route_planner_search" />
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">No Route yet!</p>
+            <p>Create your first route by clicking the "Create" button above.</p>
+        </field>
+    </record>
+</odoo>

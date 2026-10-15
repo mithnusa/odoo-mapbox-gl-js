@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+    <t
+        t-name="web_view_mapbox_gl_geolocate.PopupContent"
+        t-inherit="web_view_base_mapbox_gl.PopupContent"
+        t-inherit-mode="primary"
+    >
+        <xpath expr="//span[@t-out='geometryType']" position="after">
+            <t t-if="isShifted">
+                <i
+                    class="fa fa-fw fa-lg fa-info-circle text-info"
+                    data-tooltip="This marker has been shifted to avoid overlap with other markers. The line points to its original location."
+                />
+            </t>
+        </xpath>
+    </t>
+</templates>

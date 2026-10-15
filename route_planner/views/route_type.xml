@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_route_type_form" model="ir.ui.view">
+        <field name="name">route.type.form</field>
+        <field name="model">route.type</field>
+        <field name="arch" type="xml">
+            <form string="Route Type">
+                <sheet>
+                    <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active" />
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name" placeholder="Route type.." />
+                        </h1>
+                    </div>
+                    <group>
+                        <group>
+                            <field name="departure_title" placeholder="Route departure title.." />
+                            <field name="route_color" widget="color_picker" />
+                            <field name="default_service_duration" widget="float_time" />
+                            <field name="ir_sequence_id" groups="base.group_system" />
+                        </group>
+                        <group>
+                            <field name="vehicle_required" widget="boolean_toggle" />
+                            <field name="driver_required" widget="boolean_toggle" />
+                            <field name="departure_date_required" widget="boolean_toggle" />
+                        </group>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_route_type_list" model="ir.ui.view">
+        <field name="name">route.type.list</field>
+        <field name="model">route.type</field>
+        <field name="arch" type="xml">
+            <list string="Route Types">
+                <field name="name" />
+                <field name="route_color" widget="color_picker" string="" />
+                <field name="departure_title" />
+                <field name="default_service_duration" widget="float_time" optional="show" />
+            </list>
+        </field>
+    </record>
+
+    <record id="action_route_type" model="ir.actions.act_window">
+        <field name="name">Route Types</field>
+        <field name="res_model">route.type</field>
+        <field name="view_mode">list,form</field>
+    </record>
+</odoo>

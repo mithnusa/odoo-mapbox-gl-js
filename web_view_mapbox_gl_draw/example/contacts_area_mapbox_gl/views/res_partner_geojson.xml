@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+    <record id="view_res_partner_geojson_form" model="ir.ui.view">
+        <field name="name">view.res.partner.geojson.form</field>
+        <field name="model">res.partner.geojson</field>
+        <field name="arch" type="xml">
+            <form string="Land">
+                <field
+                    name="geojson"
+                    widget="mapbox_gl_draw_geojson"
+                    options="{'default_center': [106.82703162885998, -6.175664127601439], 'field_area': 'area'}"
+                />
+                <group>
+                    <group>
+                        <field name="name" required="1" placeholder="Name" />
+                        <field name="partner_id" options="{'no_create': True}" placeholder="Customer" />
+                    </group>
+                    <group>
+                        <label for="area" />
+                        <div>
+                            <field name="area" class="oe_inline" nolabel="1" />
+                            <span>m</span>
+                            <sup>2</sup>
+                        </div>
+                        <field name="color" widget="color_picker" />
+                    </group>
+                </group>
+                <field name="description" placeholder="Description" />
+            </form>
+        </field>
+    </record>
+    <record id="view_res_partner_geojson_tree" model="ir.ui.view">
+        <field name="name">view.res.partner.geojson.tree</field>
+        <field name="model">res.partner.geojson</field>
+        <field name="arch" type="xml">
+            <list string="Land">
+                <field name="partner_id" />
+                <field name="color" widget="color_picker" string="" />
+                <field name="name" />
+                <field name="area" />
+            </list>
+        </field>
+    </record>
+    <record id="view_res_partner_geojson_mapbox" model="ir.ui.view">
+        <field name="name">view.res.partner.geojson.mapbox</field>
+        <field name="model">res.partner.geojson</field>
+        <field name="arch" type="xml">
+            <mapbox_gl
+                js_class="mapbox_gl_draw_contacts_area"
+                color_field="color"
+                string="Land"
+                geojson_field="geojson"
+                title_field="name"
+                description_field="description"
+            >
+                <field name="name" />
+                <field name="geojson" />
+                <field name="partner_id" />
+                <field name="area" />
+                <field name="color" />
+                <field name="description" />
+            </mapbox_gl>
+        </field>
+    </record>
+    <record id="view_res_partner_geojson_search" model="ir.ui.view">
+        <field name="name">view.res.partner.geojson.search</field>
+        <field name="model">res.partner.geojson</field>
+        <field name="arch" type="xml">
+            <search string="Search Land">
+                <field name="name" />
+                <field name="partner_id" />
+                <field name="active" invisible="1" />
+                <filter name="inactive" string="Archived" domain="[('active', '=', False)]" />
+                <separator />
+                <filter name="group_by_customer" string="Customer" context="{'group_by': 'partner_id'}" />
+            </search>
+        </field>
+    </record>
+    <record id="action_res_partner_geojson" model="ir.actions.act_window">
+        <field name="name">Land</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">res.partner.geojson</field>
+        <field name="view_mode">mapbox_gl,list,form</field>
+        <field name="search_view_id" ref="view_res_partner_geojson_search" />
+    </record>
+
+    <menuitem
+        id="menu_partner_geojson"
+        name="Mapbox Land"
+        sequence="2"
+        action="action_res_partner_geojson"
+        parent="contacts.menu_contacts"
+    />
+</odoo>
