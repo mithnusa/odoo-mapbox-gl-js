@@ -335,14 +335,30 @@ export function mockCheckInternetConnection(Prototype) {
 }
 
 /**
- * Blocks native fetch() so a test that reaches a mounted, ready map never
- * fires a real external HTTP request (e.g. the Mapbox Directions/
- * Optimization API, called directly via fetch() rather than through Odoo's
- * rpc service). Opt-in: only views that call fetch() themselves need this.
+ * Blocks requests to the real Mapbox REST APIs (Directions, Optimization,
+ * Geocoding, ...) so a test that reaches a mounted, ready map never fires a
+ * real external HTTP request — e.g. a view that calls fetch('https://api.
+ * mapbox.com/...') directly rather than through Odoo's rpc service.
+ * Opt-in: only views that call fetch() themselves need this.
+ *
+ * Deliberately URL-scoped rather than a blanket override: Hoot's own
+ * MockXMLHttpRequest (which Odoo's XHR-based rpc() service — get_views,
+ * call_kw, ... — ends up going through in tests) delegates to window.fetch
+ * internally (see hoot/mock/network.js). Replacing window.fetch outright
+ * would silently break every mocked RPC call in the same test, not just the
+ * Mapbox ones; every non-Mapbox request is passed through to the fetch that
+ * was in place before this patch (Hoot's own mocked one) unchanged.
  */
 export function blockNativeFetch() {
+    const originalFetch = window.fetch;
     patchWithCleanup(window, {
-        fetch: () => Promise.reject(new Error('Network disabled in tests')),
+        fetch: (input, init) => {
+            const url = typeof input === 'string' ? input : input?.url || '';
+            if (url.includes('api.mapbox.com')) {
+                return Promise.reject(new Error('Network disabled in tests'));
+            }
+            return originalFetch(input, init);
+        },
     });
 }
 
