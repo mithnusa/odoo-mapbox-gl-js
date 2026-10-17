@@ -37,5 +37,8 @@ to Contacts, Partners, or other models.
             "base_mapbox_gl/static/src/utils/**/*",
             "base_mapbox_gl/static/src/components/**/*",
         ],
+        "web.assets_unit_tests": [
+            "base_mapbox_gl/static/tests/**/*",
+        ],
     },
 }
