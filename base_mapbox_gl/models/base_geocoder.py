@@ -20,7 +20,7 @@ class BaseGeocoder(models.AbstractModel):
             return None
 
         IrConfigSudo = self.env['ir.config_parameter'].sudo()
-        mapbox_token = IrConfigSudo.get_param(
+        mapbox_token = IrConfigSudo.get_str(
             'base_mapbox_gl.access_token', default=''
         )
         if not mapbox_token:
@@ -40,7 +40,7 @@ class BaseGeocoder(models.AbstractModel):
         if 'country' in kw:
             params['country'] = kw['country']
 
-        web_base_url = IrConfigSudo.get_param('web.base.url', default='')
+        web_base_url = IrConfigSudo.get_str('web.base.url', default='')
         headers = {'Referer': web_base_url} if web_base_url else {}
 
         try:

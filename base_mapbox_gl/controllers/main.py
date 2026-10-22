@@ -7,23 +7,23 @@ class MapboxGlController(http.Controller):
     @http.route('/web/mapbox_gl/settings', type='jsonrpc', auth='user')
     def mapbox_gl_settings(self):
         IrParam = request.env['ir.config_parameter'].sudo()
-        access_token = IrParam.get_param(
+        access_token = IrParam.get_str(
             'base_mapbox_gl.access_token', default=''
         )
         # Custom style URL
-        custom_style_url = IrParam.get_param(
+        custom_style_url = IrParam.get_str(
             'base_mapbox_gl.style_url', default=''
         )
         # Style selected from preset options
-        preset_style = IrParam.get_param('base_mapbox_gl.style', default='')
-        lighting = IrParam.get_param('base_mapbox_gl.lighting', default='')
-        theme = IrParam.get_param('base_mapbox_gl.theme', default='')
+        preset_style = IrParam.get_str('base_mapbox_gl.style', default='')
+        lighting = IrParam.get_str('base_mapbox_gl.lighting', default='')
+        theme = IrParam.get_str('base_mapbox_gl.theme', default='')
         # Projection
-        projection = IrParam.get_param(
+        projection = IrParam.get_str(
             'base_mapbox_gl.projection', default='globe'
         )
         # Language
-        language = IrParam.get_param('base_mapbox_gl.language', default='en')
+        language = IrParam.get_str('base_mapbox_gl.language', default='en')
 
         values = {
             'access_token': access_token,

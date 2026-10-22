@@ -26,7 +26,7 @@ to Contacts, Partners, or other models.
     "website": "https://www.mithnusa.com",
     "support": "yopiangi@gmail.com",
     "category": "Hidden",
-    "version": "19.0.1.1.0",
+    "version": "20.0.1.0.0",
     "depends": ["web", "base_geolocalize"],
     "data": [
         "data/data.xml",

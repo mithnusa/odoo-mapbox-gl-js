@@ -1,7 +1,8 @@
 /** @odoo-module **/
 
 import { useService } from '@web/core/utils/hooks';
-import { Component, onWillUnmount, onWillStart, useState, useEffect, useSubEnv } from '@odoo/owl';
+import { Component, onWillUnmount, onWillStart, proxy } from '@odoo/owl';
+import { useLayoutEffect, useSubEnv } from '@web/owl2/utils';
 import { generateUUID4 } from './utils';
 import { applyMapboxGlCore } from './mapbox_gl_core';
 
@@ -12,7 +13,8 @@ import { applyMapboxGlCore } from './mapbox_gl_core';
  * style switching, and cleanup via shared core methods from mapbox_gl_core.js.
  *
  * **Required:** Subclasses must implement:
- * - `containerElement` getter — returns `{ el: HTMLElement }` for the map container
+ * - `containerElement` getter — returns the OWL `signal.ref()` for the map container;
+ *   calling it (`this.containerElement()`) returns the `HTMLElement`, or `undefined` if unmounted
  *
  * **Optional overrides (defined in mapbox_gl_core.js):**
  * - `onMapLoaded()` — called when the map is fully loaded and controls are ready
@@ -51,7 +53,7 @@ export class BaseMapboxGlComponent extends Component {
     setup() {
         this.notificationService = useService('notification');
 
-        this.mapboxState = useState({
+        this.mapboxState = proxy({
             isMapReady: false,
             assetsLoaded: false,
             isMapLoaded: false,
@@ -90,7 +92,7 @@ export class BaseMapboxGlComponent extends Component {
             this.loadAssets();
         });
 
-        useEffect(
+        useLayoutEffect(
             (assetsLoaded, settings, isInternetConnected, containerEl) => {
                 if (assetsLoaded && settings && isInternetConnected && containerEl) {
                     if (!containerEl.getAttribute('id')) {
@@ -101,11 +103,11 @@ export class BaseMapboxGlComponent extends Component {
             },
             () => {
                 const { assetsLoaded, settings, isInternetConnected } = this._getMapboxState();
-                return [assetsLoaded, settings, isInternetConnected, this.containerElement?.el];
+                return [assetsLoaded, settings, isInternetConnected, this.containerElement?.()];
             }
         );
 
-        useEffect(
+        useLayoutEffect(
             (isMapLoaded, isMapReady) => {
                 if (isMapLoaded && isMapReady) {
                     this.onMapLoaded();
@@ -128,10 +130,10 @@ export class BaseMapboxGlComponent extends Component {
 
     /**
      * Abstract getter that must be implemented by subclasses.
-     * Must return an object with an `.el` property pointing to the map container DOM element.
+     * Must return the OWL `signal.ref()` for the map container, callable to get the DOM element.
      *
      * @abstract
-     * @returns {{ el: HTMLElement }} DOM element reference for the map container
+     * @returns {Function} OWL `signal.ref()`; calling it returns the map container `HTMLElement`
      * @throws {Error} When not implemented by a subclass
      */
     get containerElement() {

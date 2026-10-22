@@ -1,14 +1,16 @@
 import { _t } from '@web/core/l10n/translation';
 import { loadJS } from '@web/core/assets';
 import { debounce } from '@web/core/utils/timing';
-import { Component, onWillStart, xml, onMounted, onWillUnmount } from '@odoo/owl';
+import { Component, onWillStart, xml, onMounted, onWillUnmount, useProps, t } from '@odoo/owl';
 import { MAPBOX_CONFIG } from '../../utils/utils';
 
 export class MapboxGlSearch extends Component {
     static template = xml`<span></span>`;
-    static props = {
-        description: { type: String, optional: true },
+    static propsSchema = {
+        description: t.any().optional(true),
     };
+    props = useProps(this.constructor.propsSchema);
+
     setup() {
         this.mapboxSearchBox = null;
         this.assetIsLoaded = false;

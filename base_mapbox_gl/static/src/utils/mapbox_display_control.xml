@@ -4,7 +4,7 @@
         <div class="o_mapbox_style_switcher" t-att-data-current-style="currentStyle">
             <div class="o_mapbox_style_switcher_header">
                 <button type="button" class="o_mapbox_style_switcher_toggle btn btn-sm" title="Change map style">
-                    <i class="fa fa-paint-brush" />
+                    <i class="oi" data-icon="brush" />
                 </button>
             </div>
             <div class="o_mapbox_style_switcher_content" style="display: none;">
@@ -16,8 +16,8 @@
                             t-att-data-style-key="style.key"
                             t-att-title="style.description"
                         >
-                            <i t-att-class="style.icon" />
-                            <span t-esc="style.label" />
+                            <i class="oi" t-att-data-icon="style.icon" />
+                            <span t-out="style.label" />
                         </button>
                     </t>
                 </div>
@@ -111,7 +111,7 @@
                             <t t-foreach="languageSupported" t-as="lang" t-key="lang.code">
                                 <option
                                     t-att-value="lang.code"
-                                    t-esc="lang.title"
+                                    t-out="lang.title"
                                     t-attf-selected="#{ currentLanguage === lang.code ? 'selected' : undefined }"
                                 />
                             </t>

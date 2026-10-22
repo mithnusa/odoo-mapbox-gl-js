@@ -1,7 +1,8 @@
 /** @odoo-module **/
 
 import { useService } from '@web/core/utils/hooks';
-import { onWillUnmount, onWillStart, useState, useEffect, useSubEnv } from '@odoo/owl';
+import { onWillUnmount, onWillStart, proxy } from '@odoo/owl';
+import { useLayoutEffect, useSubEnv } from '@web/owl2/utils';
 import { generateUUID4 } from './utils';
 import { applyMapboxGlCore } from './mapbox_gl_core';
 
@@ -16,7 +17,8 @@ import { applyMapboxGlCore } from './mapbox_gl_core';
  * (e.g., ListRenderer, FormRenderer).
  *
  * **Required:** The consuming class must implement:
- * - `containerElement` getter — returns `{ el: HTMLElement }` for the map container
+ * - `containerElement` getter — returns the OWL `signal.ref()` for the map container;
+ *   calling it (`this.containerElement()`) returns the `HTMLElement`, or `undefined` if unmounted
  *
  * **Optional overrides (defined in mapbox_gl_core.js):**
  * - `onMapLoaded()` — called when the map is fully loaded and controls are ready
@@ -78,7 +80,7 @@ export function withMapboxGl(Base) {
          * @private
          */
         _initializeMapboxState() {
-            this.mapboxState = useState({
+            this.mapboxState = proxy({
                 isMapReady: false,
                 assetsLoaded: false,
                 isMapLoaded: false,
@@ -126,11 +128,12 @@ export function withMapboxGl(Base) {
                 this.loadAssets();
             });
 
-            useEffect(
-                (assetsLoaded, containerEl, settings, isInternetConnected) => {
-                    if (assetsLoaded && containerEl.el && settings && isInternetConnected) {
-                        if (!containerEl.el.getAttribute('id')) {
-                            containerEl.el.setAttribute('id', generateUUID4());
+            useLayoutEffect(
+                (assetsLoaded, containerRef, settings, isInternetConnected) => {
+                    const containerEl = containerRef && containerRef();
+                    if (assetsLoaded && containerEl && settings && isInternetConnected) {
+                        if (!containerEl.getAttribute('id')) {
+                            containerEl.setAttribute('id', generateUUID4());
                         }
                         this.initializeMap();
                     }
@@ -140,12 +143,12 @@ export function withMapboxGl(Base) {
                     try {
                         return [state.assetsLoaded, this.containerElement, state.settings, state.isInternetConnected];
                     } catch (error) {
-                        return [state.assetsLoaded, {}, state.settings, state.isInternetConnected];
+                        return [state.assetsLoaded, null, state.settings, state.isInternetConnected];
                     }
                 }
             );
 
-            useEffect(
+            useLayoutEffect(
                 (isMapLoaded, isMapReady) => {
                     if (isMapLoaded && isMapReady) {
                         this.onMapLoaded();
@@ -181,14 +184,14 @@ export function withMapboxGl(Base) {
          * Abstract getter that must be implemented by child classes
          *
          * @abstract
-         * @returns {Object} DOM element reference with .el property
+         * @returns {Function} OWL `signal.ref()`; calling it returns the map container `HTMLElement`
          * @throws {Error} When not implemented by child class
          */
         get containerElement() {
             throw new Error(
                 'containerElement getter must be implemented by classes using withMapboxGl() mixin. ' +
-                    'It should return an object with an .el property containing the DOM element for the map. ' +
-                    'Example: return this.mapRef; where mapRef is created with useRef("mapContainer")'
+                    'It should return the signal.ref() for the map container, callable to get the DOM element. ' +
+                    'Example: return this.mapRef; where mapRef is created with signal.ref()'
             );
         }
     }

@@ -261,7 +261,7 @@ const mapboxGlCoreMethods = {
 
         const state = this._getMapboxState();
         const settings = state.settings;
-        const mapEl = this.containerElement;
+        const mapEl = this.containerElement();
 
         // Resolve style: map 'osm-tiles' key to actual OSM style object
         let resolvedStyle = this.defaultMapStyle || settings.style || MAPBOX_CONFIG.DEFAULT_STYLE;
@@ -272,7 +272,7 @@ const mapboxGlCoreMethods = {
 
         const options = {
             accessToken: settings.access_token,
-            container: mapEl.el.getAttribute('id'),
+            container: mapEl.getAttribute('id'),
             style: resolvedStyle,
             center: this.defaultMapCenter,
             zoom: MAPBOX_CONFIG.DEFAULT_ZOOM,
@@ -715,56 +715,56 @@ const mapboxGlCoreMethods = {
                 url: MAPBOX_STYLES.STANDARD,
                 label: 'Standard',
                 description: 'Modern 3D style with dynamic lighting',
-                icon: 'fa fa-map-o',
+                icon: 'map',
             },
             {
                 key: 'standard-satellite',
                 url: MAPBOX_STYLES.STANDARD_SATELLITE,
                 label: 'Satellite',
                 description: 'Satellite imagery with standard styling',
-                icon: 'fa fa-globe',
+                icon: 'public',
             },
             {
                 key: 'streets',
                 url: MAPBOX_STYLES.STREETS,
                 label: 'Streets',
                 description: 'Classic street map style',
-                icon: 'fa fa-road',
+                icon: 'road',
             },
             {
                 key: 'outdoors',
                 url: MAPBOX_STYLES.OUTDOORS,
                 label: 'Outdoors',
                 description: 'Terrain and outdoor features',
-                icon: 'fa fa-tree',
+                icon: 'park',
             },
             {
                 key: 'satellite-streets',
                 url: MAPBOX_STYLES.SATELLITE_STREETS,
                 label: 'Hybrid',
                 description: 'Satellite with street labels',
-                icon: 'fa fa-map-signs',
+                icon: 'signpost',
             },
             {
                 key: 'osm-tiles',
                 url: MAPBOX_STYLES.OSM,
                 label: 'OSM',
                 description: 'OpenStreetMap',
-                icon: 'fa fa-map',
+                icon: 'map',
             },
             {
                 key: 'light-v11',
                 url: MAPBOX_STYLES.LIGHT,
                 label: 'Light',
                 description: 'Light theme with minimalistic design',
-                icon: 'fa fa-sun-o',
+                icon: 'light_mode',
             },
             {
                 key: 'dark-v11',
                 url: MAPBOX_STYLES.DARK,
                 label: 'Dark',
                 description: 'Dark theme with minimalistic design',
-                icon: 'fa fa-moon-o',
+                icon: 'dark_mode',
             },
         ];
     },
@@ -785,7 +785,7 @@ const mapboxGlCoreMethods = {
      */
     attachStyleSwitcherEvents() {
         try {
-            const container = this.containerElement.el;
+            const container = this.containerElement();
             const switcher = container.querySelector('.o_mapbox_style_switcher');
             if (!switcher) return;
 
@@ -879,8 +879,7 @@ const mapboxGlCoreMethods = {
         const isVisible = content.style.display !== 'none';
         content.style.display = isVisible ? 'none' : 'block';
         toggle.classList.toggle('active', !isVisible);
-        toggle.querySelector('.fa').classList.toggle('fa-close', !isVisible);
-        toggle.querySelector('.fa').classList.toggle('fa-paint-brush', isVisible);
+        toggle.querySelector('.oi')?.setAttribute('data-icon', isVisible ? 'brush' : 'close');
     },
 
     /**
@@ -1228,16 +1227,17 @@ const mapboxGlCoreMethods = {
      */
     _showErrorContent(msg) {
         try {
-            const mapEl = this.containerElement;
-            if (mapEl && mapEl.el) {
-                const mapInfoEl = mapEl.el.parentElement.querySelector('.o_mapboxgl_view_startpoint');
+            const mapEl = this.containerElement();
+            if (mapEl) {
+                const mapInfoEl = mapEl.parentElement.querySelector('.o_mapboxgl_view_startpoint');
                 if (mapInfoEl) {
                     const divEl = document.createElement('div');
                     divEl.className = 'text-muted small';
                     const p1El = document.createElement('p');
                     p1El.className = 'mb-1';
                     const iconEl = document.createElement('i');
-                    iconEl.className = 'fa fa-2x fa-warning d-block text-center p-2';
+                    iconEl.className = 'oi fs-2 d-block text-center p-2';
+                    iconEl.setAttribute('data-icon', 'warning');
                     p1El.appendChild(iconEl);
                     p1El.appendChild(
                         document.createTextNode(
