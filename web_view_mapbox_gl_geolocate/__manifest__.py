@@ -50,8 +50,9 @@ Key Features
     'website': 'https://www.mithnusa.com',
     'support': 'yopiangi@gmail.com',
     'category': 'Hidden',
-    'version': '19.0.1.0.1',
+    'version': '20.0.1.0.0',
     'depends': ['web_view_base_mapbox_gl'],
+    'uninstall_hook': '_uninstall_mapbox_gl_geolocate',
     'assets': {
         'web.assets_backend': [
             'web_view_mapbox_gl_geolocate/static/src/views/**/*',
