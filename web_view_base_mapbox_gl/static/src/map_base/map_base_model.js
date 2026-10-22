@@ -140,8 +140,14 @@ export class BaseMapboxGlModel extends RelationalModel {
             // Odoo serializes an unset Float as 0.0, so 0.0 is treated as
             // "not geolocated" alongside null/false.
             const nullValues = [null, false];
-            let latDomain = [[this.viewConfig.latField, 'not in', nullValues]];
-            let lngDomain = [[this.viewConfig.lngField, 'not in', nullValues]];
+            let latDomain = [
+                [this.viewConfig.latField, 'not in', nullValues],
+                [this.viewConfig.latField, '!=', 0.0],
+            ];
+            let lngDomain = [
+                [this.viewConfig.lngField, 'not in', nullValues],
+                [this.viewConfig.lngField, '!=', 0.0],
+            ];
 
             if (this.config.fields[this.viewConfig.latField].related) {
                 const related_source = this.config.fields[this.viewConfig.latField].related.split('.')[0];
@@ -165,8 +171,13 @@ export class BaseMapboxGlModel extends RelationalModel {
         if (this._hasSearchableGeoFields()) {
             const nullValues = [null, false];
             // Complement of mapDomain: a record is not geolocated when ANY
-            // required coordinate source is missing — hence OR, not AND.
-            const parts = [[[this.viewConfig.latField, 'in', nullValues]], [[this.viewConfig.lngField, 'in', nullValues]]];
+            // required coordinate source is missing or 0.0 — hence OR, not AND.
+            const parts = [
+                [[this.viewConfig.latField, 'in', nullValues]],
+                [[this.viewConfig.latField, '=', 0.0]],
+                [[this.viewConfig.lngField, 'in', nullValues]],
+                [[this.viewConfig.lngField, '=', 0.0]],
+            ];
             for (const fieldName of [this.viewConfig.latField, this.viewConfig.lngField]) {
                 const related = this.config.fields[fieldName].related;
                 if (related) {
