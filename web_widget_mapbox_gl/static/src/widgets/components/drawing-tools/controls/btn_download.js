@@ -7,7 +7,8 @@ export function createDownloadButton(onClick) {
     btn.title = _t('Export GeoJSON File');
     btn.setAttribute('aria-label', _t('Export GeoJSON File'));
     const icon = document.createElement('span');
-    icon.className = 'fa fa-download';
+    icon.className = 'oi';
+    icon.setAttribute('data-icon', 'download');
     icon.style.fontSize = '15px';
     btn.appendChild(icon);
     btn.addEventListener('click', (e) => {

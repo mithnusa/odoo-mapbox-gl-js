@@ -13,7 +13,8 @@ export class RedoButton {
         btn.setAttribute('aria-label', _t('Redo'));
         btn.disabled = true;
         const icon = document.createElement('span');
-        icon.className = 'fa fa-repeat';
+        icon.className = 'oi';
+        icon.setAttribute('data-icon', 'redo');
         icon.style.fontSize = '15px';
         btn.appendChild(icon);
         btn.addEventListener('click', (e) => {

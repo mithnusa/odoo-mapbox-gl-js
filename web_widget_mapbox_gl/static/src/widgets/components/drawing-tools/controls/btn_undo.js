@@ -13,7 +13,8 @@ export class UndoButton {
         btn.setAttribute('aria-label', _t('Undo'));
         btn.disabled = true;
         const icon = document.createElement('span');
-        icon.className = 'fa fa-undo';
+        icon.className = 'oi';
+        icon.setAttribute('data-icon', 'undo');
         icon.style.fontSize = '15px';
         btn.appendChild(icon);
         btn.addEventListener('click', (e) => {

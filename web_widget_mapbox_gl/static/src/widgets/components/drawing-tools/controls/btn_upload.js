@@ -7,7 +7,8 @@ export function createUploadButton(onClick) {
     btn.title = _t('Import GeoJSON File');
     btn.setAttribute('aria-label', _t('Import GeoJSON File'));
     const icon = document.createElement('span');
-    icon.className = 'fa fa-upload';
+    icon.className = 'oi';
+    icon.setAttribute('data-icon', 'upload');
     icon.style.fontSize = '15px';
     btn.appendChild(icon);
     btn.addEventListener('click', (e) => {

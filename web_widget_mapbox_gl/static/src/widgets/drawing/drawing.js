@@ -1,7 +1,8 @@
 import { _t } from '@web/core/l10n/translation';
 import { registry } from '@web/core/registry';
 import { standardFieldProps } from '@web/views/fields/standard_field_props';
-import { useRef, useSubEnv } from '@odoo/owl';
+import { signal, t, useProps } from '@odoo/owl';
+import { useSubEnv } from '@web/owl2/utils';
 
 import { MapboxGlSearch } from '@base_mapbox_gl/components/mapbox_search/mapbox_search';
 import { BaseMapboxGlComponent } from '@base_mapbox_gl/utils/base_mapbox_gl';
@@ -11,33 +12,30 @@ import { MapboxGlDrawing } from '../components/drawing-tools/drawing-tools';
 
 export class MapboxGlDrawingField extends BaseMapboxGlComponent {
     static template = 'web_widget_mapbox_gl.DrawingField';
-    static defaultProps = {
-        dynamicPlaceholder: false,
-        shouldTrim: true,
-    };
     static components = {
         Drawing: MapboxGlDrawing,
         Search: MapboxGlSearch,
     };
-    static props = {
+    static propsSchema = {
         ...standardFieldProps,
-        areaField: { type: String, optional: true },
-        defaultCenter: { type: Array, optional: true },
-        mapStyleUrl: { type: String, optional: true },
-        mapProjection: { type: String, optional: true },
+        areaField: t.string().optional(),
+        defaultCenter: t.array().optional(),
+        mapStyleUrl: t.string().optional(),
+        mapProjection: t.string().optional(),
     };
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
         super.setup();
         this.validatePropsOptions();
-        this.mapRef = useRef('map');
+        this.mapRef = signal.ref();
 
         useSubEnv({
             getIsMapReady: this.isMapboxReady.bind(this),
             isMapLoaded: () => this.mapboxState.isMapLoaded,
             getMapbox: () => this.mapBoxGlJs,
             notificationService: this.notificationService,
-            getContainerElement: () => this.containerElement.el,
+            getContainerElement: () => this.containerElement(),
         });
     }
 

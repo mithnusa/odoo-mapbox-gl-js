@@ -18,7 +18,8 @@ export class RectangleButton {
         btn.title = _t('Draw Rectangle - Click one corner then click the opposite corner');
         btn.setAttribute('aria-label', _t('Draw Rectangle'));
         const icon = document.createElement('span');
-        icon.className = 'fa fa-square-o';
+        icon.className = 'oi';
+        icon.setAttribute('data-icon', 'square');
         icon.style.fontSize = '15px';
         btn.appendChild(icon);
         btn.addEventListener('click', (e) => {

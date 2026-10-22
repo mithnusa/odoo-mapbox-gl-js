@@ -3,38 +3,38 @@
     <t t-name="web_widget_mapbox_gl.LabelInputDialog" t-inherit="web.ConfirmationDialog" t-inherit-mode="primary">
         <xpath expr="//Dialog" position="attributes">
             <attribute name="size">"sm"</attribute>
-            <attribute name="title">title</attribute>
+            <attribute name="title">this.title</attribute>
         </xpath>
-        <xpath expr="//p[@t-out='props.body']" position="replace">
+        <xpath expr="//p[@t-out='this.props.body']" position="replace">
             <div class="row">
                 <div class="col">
                     <label for="label-text-input" class="form-label">Label text</label>
                     <textarea
-                        t-ref="labelInput"
+                        t-ref="this.inputRef"
                         id="label-text-input"
                         class="form-control"
                         rows="3"
-                        t-att-maxlength="maxLength"
-                        t-on-input="_onInput"
+                        t-att-maxlength="this.maxLength"
+                        t-on-input="this._onInput"
                         autofocus="true"
                         placeholder="Enter label… (Shift+Enter for new line)"
                         style="resize: vertical;"
                     />
                     <small
-                        t-attf-class="d-block mt-1 text-end {{ state.charCount >= maxLength ? 'text-danger' : 'text-muted'}}"
+                        t-attf-class="d-block mt-1 text-end {{ this.state.charCount >= this.maxLength ? 'text-danger' : 'text-muted'}}"
                     >
-                        <t t-esc="state.charCount" />
+                        <t t-out="this.state.charCount" />
                         /
-                        <t t-esc="maxLength" />
+                        <t t-out="this.maxLength" />
                     </small>
                 </div>
             </div>
         </xpath>
-        <xpath expr="//button[@t-on-click='_confirm']" position="attributes">
-            <attribute name="t-esc">confirmLabel</attribute>
+        <xpath expr="//button[@t-on-click='this._confirm']" position="attributes">
+            <attribute name="t-out">this.confirmLabel</attribute>
         </xpath>
         <!-- Always show the cancel button -->
-        <xpath expr="//button[@t-esc='props.cancelLabel']" position="attributes">
+        <xpath expr="//button[@t-out='this.props.cancelLabel']" position="attributes">
             <attribute name="t-if">true</attribute>
         </xpath>
     </t>

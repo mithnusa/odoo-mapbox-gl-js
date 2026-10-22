@@ -32,7 +32,8 @@ export class LabelButton {
         btn.title = _t('Add Label - Click button then click the map to place a text label');
         btn.setAttribute('aria-label', _t('Add Label'));
         const icon = document.createElement('span');
-        icon.className = 'fa fa-font';
+        icon.className = 'oi';
+        icon.setAttribute('data-icon', 'font_download');
         icon.style.fontSize = '15px';
         btn.appendChild(icon);
         btn.addEventListener('click', (e) => {
@@ -86,11 +87,17 @@ export class LabelButton {
         if (isEditing) {
             this.el.title = _t('Edit Label');
             this.el.setAttribute('aria-label', _t('Edit Label'));
-            if (icon) icon.className = 'fa fa-pencil';
+            if (icon) {
+                icon.className = 'oi oi-filled';
+                icon.setAttribute('data-icon', 'edit');
+            }
         } else {
             this.el.title = _t('Add Label - Click button then click the map to place a text label');
             this.el.setAttribute('aria-label', _t('Add Label'));
-            if (icon) icon.className = 'fa fa-font';
+            if (icon) {
+                icon.className = 'oi';
+                icon.setAttribute('data-icon', 'font_download');
+            }
         }
         if (icon) icon.style.fontSize = '15px';
     }

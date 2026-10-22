@@ -1,7 +1,8 @@
 import { _t } from '@web/core/l10n/translation';
 import { debounce } from '@web/core/utils/timing';
 import { sprintf } from '@web/core/utils/strings';
-import { Component, useEffect, onWillUnmount, onWillUpdateProps, xml } from '@odoo/owl';
+import { Component, onWillUnmount, onWillUpdateProps, t, useProps, xml } from '@odoo/owl';
+import { useLayoutEffect } from '@web/owl2/utils';
 import { useService } from '@web/core/utils/hooks';
 import { validateGeoJson } from '@base_mapbox_gl/utils/utils';
 import { createPolygonCutMode } from './custom_mode_polygon_cut';
@@ -24,13 +25,14 @@ import {
 
 export class MapboxGlDrawing extends Component {
     static template = xml`<span></span>`;
-    static props = {
-        mapbox: Object,
-        saveFeatures: Function,
-        dataGeoJson: { type: Object, optional: true },
-        record: Object,
-        readonly: Boolean,
+    static propsSchema = {
+        mapbox: t.object(),
+        saveFeatures: t.function(),
+        dataGeoJson: t.object().optional(),
+        record: t.object(),
+        readonly: t.boolean(),
     };
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
         this.mapboxDraw = null;
@@ -67,7 +69,7 @@ export class MapboxGlDrawing extends Component {
             }
         };
 
-        useEffect(
+        useLayoutEffect(
             (mapbox, readonly) => {
                 if (mapbox) {
                     const onMapRemove = () => {

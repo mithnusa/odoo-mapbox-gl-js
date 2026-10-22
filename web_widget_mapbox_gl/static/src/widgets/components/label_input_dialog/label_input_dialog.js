@@ -1,46 +1,43 @@
 import { _t } from '@web/core/l10n/translation';
 import { useService } from '@web/core/utils/hooks';
-import { useRef, useState, onMounted } from '@odoo/owl';
-import { ConfirmationDialog } from '@web/core/confirmation_dialog/confirmation_dialog';
+import { proxy, signal, t, useProps, onMounted } from '@odoo/owl';
+import { ConfirmationDialog, confirmationDialogProps } from '@web/core/confirmation_dialog/confirmation_dialog';
+
+const labelInputDialogProps = {
+    ...confirmationDialogProps,
+    initialValue: t.string().optional(''),
+    isEdit: t.boolean().optional(false),
+};
 
 export class LabelInputDialog extends ConfirmationDialog {
     static template = 'web_widget_mapbox_gl.LabelInputDialog';
-    static props = {
-        ...ConfirmationDialog.props,
-        initialValue: { type: String, optional: true },
-        isEdit: { type: Boolean, optional: true },
-    };
-    static defaultProps = {
-        ...ConfirmationDialog.defaultProps,
-        initialValue: '',
-        isEdit: false,
-    };
+    props = useProps(labelInputDialogProps);
 
     static MAX_LENGTH = 100;
 
     setup() {
         super.setup();
-        this.inputRef = useRef('labelInput');
+        this.inputRef = signal.ref();
         this.notificationService = useService('notification');
 
-        this.state = useState({
+        this.state = proxy({
             charCount: this.props.initialValue?.length ?? 0,
         });
 
         onMounted(() => {
-            if (this.inputRef.el) {
-                this.inputRef.el.value = this.props.initialValue;
-                this.inputRef.el.focus();
+            if (this.inputRef()) {
+                this.inputRef().value = this.props.initialValue;
+                this.inputRef().focus();
             }
         });
     }
 
     _onInput() {
-        this.state.charCount = this.inputRef.el?.value?.length ?? 0;
+        this.state.charCount = this.inputRef()?.value?.length ?? 0;
     }
 
     async _confirm() {
-        const raw = this.inputRef.el?.value ?? '';
+        const raw = this.inputRef()?.value ?? '';
         // Normalize Windows line endings and strip leading/trailing blank lines
         const text = raw.replace(/\r\n/g, '\n').replace(/\r/g, '\n').trim();
         if (!text) {

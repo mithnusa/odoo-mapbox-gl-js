@@ -12,7 +12,8 @@ export class MeasureToggleButton {
         btn.title = _t('Toggle Measurements');
         btn.setAttribute('aria-label', _t('Toggle Measurements'));
         const icon = document.createElement('span');
-        icon.className = 'fa fa-eye-slash';
+        icon.className = 'oi';
+        icon.setAttribute('data-icon', 'visibility_off');
         icon.style.fontSize = '15px';
         btn.appendChild(icon);
         btn.addEventListener('click', (e) => {
@@ -38,7 +39,7 @@ export class MeasureToggleButton {
             this.el.disabled = false;
             this.el.style.opacity = '';
             this.el.classList.toggle('active', enabled);
-            if (icon) icon.className = enabled ? 'fa fa-eye' : 'fa fa-eye-slash';
+            if (icon) icon.setAttribute('data-icon', enabled ? 'visibility' : 'visibility_off');
             if (icon) icon.style.fontSize = '15px';
         }
     }

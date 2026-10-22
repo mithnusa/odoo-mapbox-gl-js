@@ -2,36 +2,36 @@
 <templates xml:space="preserve">
     <div t-name="web_widget_mapbox_gl.DrawingField">
         <div class="o_mapboxgl_renderer">
-            <div class="o_mapboxgl_view border rounded-2" id="o_mapboxgl_view_widget" t-ref="map" />
-            <div class="o_mapboxgl_view_startpoint" t-if="!mapboxState.isMapReady">
-                <t t-if="mapboxState.isCheckingConnection">
-                    <i class="fa fa-spinner fa-spin me-2" />
+            <div class="o_mapboxgl_view border rounded-2" id="o_mapboxgl_view_widget" t-ref="this.mapRef" />
+            <div class="o_mapboxgl_view_startpoint" t-if="!this.mapboxState.isMapReady">
+                <t t-if="this.mapboxState.isCheckingConnection">
+                    <i class="oi oi-spin me-2" data-icon="progress_activity" />
                     <span>Checking connection...</span>
                 </t>
-                <t t-elif="mapboxState.isInternetConnected === false">
+                <t t-elif="this.mapboxState.isInternetConnected === false">
                     <div class="text-center">
-                        <i class="fa fa-wifi text-danger d-block mb-2" style="font-size: 2rem;" />
+                        <i class="oi text-danger d-block mb-2" data-icon="wifi" style="font-size: 2rem;" />
                         <span class="d-block mb-2">No internet connection</span>
-                        <button class="btn btn-sm btn-primary" t-on-click="retryConnection">
-                            <i class="fa fa-refresh me-1" />
+                        <button class="btn btn-sm btn-primary" t-on-click="this.retryConnection">
+                            <i class="oi me-1" data-icon="refresh" />
                             Retry
                         </button>
                     </div>
                 </t>
                 <t t-else="">
-                    <i class="fa fa-spinner fa-spin me-2" />
+                    <i class="oi oi-spin me-2" data-icon="progress_activity" />
                     <span>Loading map...</span>
                 </t>
             </div>
             <Drawing
-                readonly="props.readonly"
-                mapbox="mapBoxGlJs"
-                dataGeoJson="geoJson"
-                record="props.record"
-                saveFeatures.bind="handleSave"
-                t-if="mapboxState.isMapLoaded"
+                readonly="this.props.readonly"
+                mapbox="this.mapBoxGlJs"
+                dataGeoJson="this.geoJson"
+                record="this.props.record"
+                saveFeatures.bind="this.handleSave"
+                t-if="this.mapboxState.isMapLoaded"
             />
-            <Search t-if="mapboxState.isMapLoaded" />
+            <Search t-if="this.mapboxState.isMapLoaded" />
         </div>
     </div>
 </templates>

@@ -1,21 +1,20 @@
 import { _t } from '@web/core/l10n/translation';
-import { ConfirmationDialog } from '@web/core/confirmation_dialog/confirmation_dialog';
+import { t, useProps } from '@odoo/owl';
+import { ConfirmationDialog, confirmationDialogProps } from '@web/core/confirmation_dialog/confirmation_dialog';
 import { useService } from '@web/core/utils/hooks';
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
+const uploadGeoJsonFileDialogProps = {
+    ...confirmationDialogProps,
+    title: t.string().optional(_t('Import GeoJSON File')),
+    confirmLabel: t.string().optional(_t('Apply')),
+    confirm: t.function(),
+};
+
 export class UploadGeoJsonFileDialog extends ConfirmationDialog {
     static template = 'web_widget_mapbox_gl.UploadGeoJsonFileDialog';
-    static props = {
-        ...ConfirmationDialog.props,
-        confirm: Function,
-    };
-
-    static defaultProps = {
-        ...ConfirmationDialog.defaultProps,
-        title: _t('Import GeoJSON File'),
-        confirmLabel: _t('Apply'),
-    };
+    props = useProps(uploadGeoJsonFileDialogProps);
 
     setup() {
         super.setup();
@@ -24,7 +23,7 @@ export class UploadGeoJsonFileDialog extends ConfirmationDialog {
 
     async _confirm() {
         // Validate user has uploaded a file and that it is within the size limit
-        const fileInput = this.modalRef.el.querySelector('#geojson-file');
+        const fileInput = this.modalRef().querySelector('#geojson-file');
         if (fileInput.files.length === 0) {
             // Notify the user that no file was selected
             this.notificationService.add(_t('Please upload your GeoJSON file'), { type: 'danger' });

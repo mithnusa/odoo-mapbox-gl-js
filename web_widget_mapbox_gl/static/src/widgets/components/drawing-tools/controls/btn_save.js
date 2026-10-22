@@ -12,7 +12,8 @@ export class SaveButton {
         btn.title = _t('Save Changes');
         btn.setAttribute('aria-label', _t('Save Changes'));
         const icon = document.createElement('span');
-        icon.className = 'fa fa-save';
+        icon.className = 'oi';
+        icon.setAttribute('data-icon', 'save');
         icon.style.fontSize = '15px';
         btn.appendChild(icon);
         btn.addEventListener('click', (e) => {

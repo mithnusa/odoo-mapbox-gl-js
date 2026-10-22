@@ -18,7 +18,8 @@ export class CircleButton {
         btn.title = _t('Draw Circle - Click center then click to set radius');
         btn.setAttribute('aria-label', _t('Draw Circle'));
         const icon = document.createElement('span');
-        icon.className = 'fa fa-circle-o';
+        icon.className = 'oi';
+        icon.setAttribute('data-icon', 'circle');
         icon.style.fontSize = '15px';
         btn.appendChild(icon);
         btn.addEventListener('click', (e) => {
