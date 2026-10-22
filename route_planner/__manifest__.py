@@ -57,11 +57,11 @@ Key Features
     'website': 'https://github.com/mithnusa',
     'support': 'yopiangi@gmail.com',
     'category': 'Extra Tools',
-    'version': '19.0.1.2.1',
+    'version': '20.0.1.0.0',
     'depends': ['base_geolocalize', 'contacts', 'hr_fleet'],
     'data': [
         'security/security.xml',
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'data/data_ir_sequence.xml',
         'data/data_route_type.xml',
         'views/fleet_vehicle.xml',
@@ -70,4 +70,5 @@ Key Features
         'views/route_planner_line.xml',
         'views/route_menu.xml',
     ],
+    'application': True,
 }

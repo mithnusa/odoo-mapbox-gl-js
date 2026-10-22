@@ -1,0 +1,4 @@
+id,name,model_id,group_id/id,operation,domain
+access_route_planner_user_fleet_vehicle,access_route_planner_user_fleet_vehicle,fleet.vehicle,route_planner.group_route_planner_user,r,
+access_route_type_user,access_route_type_user,route.type,route_planner.group_route_planner_user,r,
+access_route_type_manager,access_route_type_manager,route.type,route_planner.group_route_planner_manager,crud,

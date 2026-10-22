@@ -84,7 +84,8 @@
                                             </div>
                                             <div t-else="" class="d-flex align-items-center gap-2 p-2 border rounded">
                                                 <i
-                                                    class="fa fa-file-o fa-2x text-primary"
+                                                    class="oi fs-2 text-primary"
+                                                    data-icon="description"
                                                     t-att-title="record.name.value"
                                                     aria-hidden="true"
                                                 />
