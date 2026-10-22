@@ -90,6 +90,9 @@ export class BaseMapboxGlModel extends RelationalModel {
      */
     _getNextConfig(currentConfig, params) {
         const nextConfig = super._getNextConfig(currentConfig, params);
+        // Capture the search domain before the geolocation filter is added:
+        // the ungeolocated count/list must follow the same search scope
+        this._searchDomain = nextConfig.domain ?? [];
         const mapDomain = this.mapDomain;
         if (mapDomain && mapDomain.length) {
             // add domain for geolocation fields
@@ -137,16 +140,18 @@ export class BaseMapboxGlModel extends RelationalModel {
             // Odoo serializes an unset Float as 0.0, so 0.0 is treated as
             // "not geolocated" alongside null/false.
             const nullValues = [null, false];
-            const conditions = [];
-            for (const fieldName of [this.viewConfig.latField, this.viewConfig.lngField]) {
-                conditions.push([[fieldName, 'not in', nullValues]]);
-                conditions.push([[fieldName, '!=', 0.0]]);
-                const related = this.config.fields[fieldName].related;
-                if (related) {
-                    conditions.push([[related.split('.')[0], 'not in', nullValues]]);
-                }
+            let latDomain = [[this.viewConfig.latField, 'not in', nullValues]];
+            let lngDomain = [[this.viewConfig.lngField, 'not in', nullValues]];
+
+            if (this.config.fields[this.viewConfig.latField].related) {
+                const related_source = this.config.fields[this.viewConfig.latField].related.split('.')[0];
+                latDomain = Domain.and([latDomain, [[related_source, 'not in', nullValues]]]).toList();
             }
-            result = Domain.and(conditions).toList();
+            if (this.config.fields[this.viewConfig.lngField].related) {
+                const related_source = this.config.fields[this.viewConfig.lngField].related.split('.')[0];
+                lngDomain = Domain.and([lngDomain, [[related_source, 'not in', nullValues]]]).toList();
+            }
+            result = Domain.and([latDomain, lngDomain]).toList();
         }
         this._mapDomainCache = result;
         return result;
@@ -160,11 +165,9 @@ export class BaseMapboxGlModel extends RelationalModel {
         if (this._hasSearchableGeoFields()) {
             const nullValues = [null, false];
             // Complement of mapDomain: a record is not geolocated when ANY
-            // required coordinate source is missing or 0.0 — hence OR, not AND.
-            const parts = [];
+            // required coordinate source is missing — hence OR, not AND.
+            const parts = [[[this.viewConfig.latField, 'in', nullValues]], [[this.viewConfig.lngField, 'in', nullValues]]];
             for (const fieldName of [this.viewConfig.latField, this.viewConfig.lngField]) {
-                parts.push([[fieldName, 'in', nullValues]]);
-                parts.push([[fieldName, '=', 0.0]]);
                 const related = this.config.fields[fieldName].related;
                 if (related) {
                     parts.push([[related.split('.')[0], 'in', nullValues]]);

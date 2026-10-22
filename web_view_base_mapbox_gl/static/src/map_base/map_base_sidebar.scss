@@ -2,11 +2,10 @@
     .o_mapbox_sidebar {
         position: relative;
         height: 100%;
-        background-color: $o-view-background-color;
         z-index: 1;
         width: 25%;
         max-width: 400px;
-        border-right: var(--ControlPanel-border-bottom, #{$o-control-panel-border-bottom});
+        // border-right: var(--ControlPanel-border-bottom, #{$o-control-panel-border-bottom});
         overflow-y: auto;
         overflow-x: hidden;
 

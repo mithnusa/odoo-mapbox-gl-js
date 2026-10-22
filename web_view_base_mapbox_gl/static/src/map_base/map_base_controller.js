@@ -1,15 +1,15 @@
 import { _t } from '@web/core/l10n/translation';
+import { OfflinePlugin } from '@web/core/offline/offline_plugin';
 import { Layout } from '@web/search/layout';
 import { useModelWithSampleData } from '@web/model/model';
 import { evaluateBooleanExpr } from '@web/core/py_js/py';
 import { usePager } from '@web/search/pager_hook';
 import { useService } from '@web/core/utils/hooks';
+import { OfflineActionHelper } from '@web/views/offline_action_helper';
 import { user } from '@web/core/user';
-import { unique } from '@web/core/utils/arrays';
 import { extractFieldsFromArchInfo } from '@web/model/relational_model/utils';
 import { download } from '@web/core/network/download';
 import { FormViewDialog } from '@web/views/view_dialogs/form_view_dialog';
-import { ConfirmationDialog } from '@web/core/confirmation_dialog/confirmation_dialog';
 import { omit } from '@web/core/utils/objects';
 import { ActionMenus, STATIC_ACTIONS_GROUP_NUMBER } from '@web/search/action_menus/action_menus';
 import { standardViewProps } from '@web/views/standard_view_props';
@@ -24,9 +24,11 @@ import { executeButtonCallback } from '@web/views/view_button/view_button_hook';
 import { CogMenu } from '@web/search/cog_menu/cog_menu';
 import { DropdownItem } from '@web/core/dropdown/dropdown_item';
 import { useExportRecords, useDeleteRecords } from '@web/views/view_hook';
+import { OfflineSearchBar } from '@web/search/search_bar/offline_search_bar';
 import { MapboxGlSearchBar } from './map_base_searchbar';
 
-import { Component, useRef, onWillStart, useState, onWillPatch, useSubEnv, useEffect } from '@odoo/owl';
+import { Component, onWillStart, onWillPatch, usePlugin, proxy, signal, t, useProps } from '@odoo/owl';
+import { render, useLayoutEffect, useSubEnv } from '@web/owl2/utils';
 
 // Constants
 const VIEW_TYPES = {
@@ -45,39 +47,39 @@ export class BaseMapboxGlController extends Component {
         SelectionBox,
         MultiRecordViewButton,
         DropdownItem,
+        OfflineActionHelper,
+        OfflineSearchBar,
         SearchBar: MapboxGlSearchBar,
     };
-    static props = {
+    static propsSchema = {
         ...standardViewProps,
-        Model: Function,
-        Renderer: Function,
-        buttonTemplate: String,
-        archInfo: Object,
-        showButtons: { type: Boolean, optional: true },
-        allowSelectors: { type: Boolean, optional: true },
-        onSelectionChanged: { type: Function, optional: true },
-        readonly: { type: Boolean, optional: true },
+        Model: t.function(),
+        Renderer: t.function(),
+        buttonTemplate: t.string(),
+        archInfo: t.object(),
+        showButtons: t.boolean().optional(true),
+        allowSelectors: t.boolean().optional(true),
+        onSelectionChanged: t.function().optional(),
+        readonly: t.boolean().optional(),
+        createRecord: t.function().optional(() => () => {}),
+        selectRecord: t.function().optional(() => () => {}),
     };
-    static defaultProps = {
-        createRecord: () => {},
-        selectRecord: () => {},
-        centerMap: () => {},
-        showButtons: true,
-        allowSelectors: true,
-    };
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
-        this.ui = useService('ui');
+        this.uiService = useService('ui');
         this.dialogService = useService('dialog');
         this.actionService = useService('action');
         this.notificationService = useService('notification');
 
-        this.rootRef = useRef('root');
+        this.rootRef = signal.ref();
 
         this.archInfo = this.props.archInfo;
+        this.offlinePlugin = usePlugin(OfflinePlugin);
         this.activeActions = this.props.archInfo.activeActions;
         this.multiEdit = this.props.archInfo.multiEdit;
-        this.model = useState(useModelWithSampleData(this.props.Model, this.modelParams, this.modelOptions));
+        this.optionalActiveFields = {};
+        this.model = proxy(useModelWithSampleData(this.props.Model, this.modelParams, this.modelOptions));
 
         this.archiveEnabled =
             'active' in this.props.fields
@@ -106,34 +108,41 @@ export class BaseMapboxGlController extends Component {
                     modelState: this.model.exportState(),
                 };
             },
+            getOrderBy: () => this.model.root.orderBy,
+            getContext: () => {
+                const optionalShow = Object.keys(this.optionalActiveFields).filter(
+                    (name) => this.optionalActiveFields[name]
+                );
+                return optionalShow.length ? { list_optional_show: optionalShow } : {};
+            },
+            reload: () => this.model.load(),
         });
 
         usePager(() => {
-            const root = this.model.root;
-            const { count, hasLimitedCount, isGrouped, limit, offset } = root;
+            const { count, hasLimitedCount, isGrouped, limit, offset } = this.model.root;
             if (!isGrouped) {
                 return {
                     offset: offset,
                     limit: limit,
                     total: count,
                     onUpdate: async ({ offset, limit }, hasNavigated) => {
-                        await this.model.root.load({ offset, limit });
-                        await this.onUpdatedPager();
+                        await this.model.root.load({ limit, offset });
                         if (hasNavigated) {
-                            this.onPageChangeScroll();
+                            this.onPageChange();
                         }
                     },
-                    updateTotal: hasLimitedCount ? () => root.fetchCount() : undefined,
+                    updateTotal: !isGrouped && hasLimitedCount ? () => this.model.root.fetchCount() : undefined,
                 };
             }
         });
 
-        useEffect(
+        useLayoutEffect(
             () => {
                 this.onSelectionChanged();
             },
             () => [this.model.root.selection.length, this.model.root.isDomainSelected]
         );
+
         this.firstLoad = true;
         onWillPatch(() => {
             this.firstLoad = false;
@@ -179,7 +188,7 @@ export class BaseMapboxGlController extends Component {
             defaultOrderBy: this.archInfo.defaultOrder,
             defaultGroupBy: this.archInfo.defaultGroupBy,
             groupsLimit: this.archInfo.groupsLimit || Number.MAX_SAFE_INTEGER,
-            multiEdit: this.archInfo.multiEdit,
+            multiEdit: !this.props.readonly && this.archInfo.multiEdit,
             activeIdsLimit: session.active_ids_limit,
             hooks: {
                 onRecordSaved: this.onRecordSaved.bind(this),
@@ -190,15 +199,21 @@ export class BaseMapboxGlController extends Component {
     }
 
     getExportableFields() {
-        return unique(
+        const { activeFields, fields } = this.model.root;
+        // Columns currently visible in the view (not invisible and, if optional, toggled on).
+        const visibleColumns = new Set(
             this.props.archInfo.columns
                 .filter((col) => col.type === 'field')
-                .filter((col) => !col.optional)
-                .filter((col) => !this.evalViewModifier(col.column_invisible, this.props.context))
-                .map((col) => this.props.fields[col.name])
-                .filter((field) => field.exportable !== false)
-                .filter((field) => field.type !== 'properties')
+                .filter((col) => !evaluateBooleanExpr(col.column_invisible, this.props.context))
+                .filter((col) => !col.optional || this.optionalActiveFields[col.name])
+                .map((col) => col.name)
         );
+        return Object.keys(activeFields)
+            .map((fieldName) => fields[fieldName])
+            .filter(Boolean)
+            .filter((field) => visibleColumns.has(field.name))
+            .filter((field) => field.exportable !== false)
+            .filter((field) => field.type !== 'properties');
     }
 
     /**
@@ -226,18 +241,6 @@ export class BaseMapboxGlController extends Component {
             const resIds = await this.model.root.getResIds(true);
             this.props.onSelectionChanged(resIds);
         }
-    }
-
-    /**
-     * Archive or unarchive selected records
-     * @param {boolean} archive - True to archive, false to unarchive
-     * @returns {Promise<void>}
-     */
-    async toggleArchiveState(archive) {
-        if (archive) {
-            return this.model.root.archive(true);
-        }
-        return this.model.root.unarchive(true);
     }
 
     /**
@@ -280,17 +283,12 @@ export class BaseMapboxGlController extends Component {
 
     /**
      * Get confirmation dialog properties for archive action
-     * @returns {Object} Dialog configuration with body, confirmLabel, and callbacks
+     * Override in child classes to customize body, confirmLabel, confirm, or cancel;
+     * defaults are supplied by DynamicList.toggleArchiveWithConfirmation().
+     * @returns {Object} {}
      */
     get archiveDialogProps() {
-        return {
-            body: _t('Are you sure that you want to archive all the selected records?'),
-            confirmLabel: _t('Archive'),
-            confirm: () => {
-                this.toggleArchiveState(true);
-            },
-            cancel: () => {},
-        };
+        return {};
     }
 
     /**
@@ -336,38 +334,41 @@ export class BaseMapboxGlController extends Component {
             export: {
                 isAvailable: () => this.isExportEnable,
                 sequence: 10,
-                icon: 'fa fa-upload',
+                icon: 'upload',
                 description: _t('Export'),
                 callback: () => this.exportRecords(),
             },
-            archive: {
-                isAvailable: () => this.archiveEnabled && !isM2MGrouped,
-                sequence: 20,
-                icon: 'oi oi-archive',
-                description: _t('Archive'),
-                callback: () => {
-                    this.dialogService.add(ConfirmationDialog, this.archiveDialogProps);
-                },
-            },
-            unarchive: {
-                isAvailable: () => this.archiveEnabled && !isM2MGrouped,
-                sequence: 30,
-                icon: 'oi oi-unarchive',
-                description: _t('Unarchive'),
-                callback: () => this.toggleArchiveState(false),
-            },
             duplicate: {
                 isAvailable: () => this.activeActions.duplicate && !isM2MGrouped,
-                sequence: 35,
-                icon: 'fa fa-clone',
+                sequence: 30,
+                icon: 'content_copy',
                 description: _t('Duplicate'),
                 callback: () => this.duplicateRecords(),
             },
+            archive: {
+                isAvailable: () => this.archiveEnabled && !isM2MGrouped,
+                availableOffline: true,
+                sequence: 40,
+                icon: 'archive',
+                description: _t('Archive'),
+                callback: () => this.model.root.toggleArchiveWithConfirmation(true, this.archiveDialogProps),
+            },
+            unarchive: {
+                isAvailable: () => this.archiveEnabled && !isM2MGrouped,
+                availableOffline: true,
+                sequence: 45,
+                icon: 'unarchive',
+                description: _t('Unarchive'),
+                callback: () => this.model.root.toggleArchiveWithConfirmation(false),
+            },
             delete: {
                 isAvailable: () => this.activeActions.delete && !isM2MGrouped,
-                sequence: 40,
-                icon: 'fa fa-trash-o',
+                availableOffline: true,
+                sequence: 50,
+                icon: 'delete',
+                iconClass: 'oi-filled',
                 description: _t('Delete'),
+                class: 'text-danger',
                 callback: () => this.onDeleteSelectedRecords(),
             },
         };
@@ -417,9 +418,9 @@ export class BaseMapboxGlController extends Component {
      */
     centerMap() {
         if (this.props.allowSelectors) {
-            this.ui.bus.trigger('mapbox-center-map');
+            this.uiService.bus.trigger('mapbox-center-map');
         } else {
-            this.render(true);
+            render(this, true);
         }
     }
 
@@ -471,7 +472,7 @@ export class BaseMapboxGlController extends Component {
      * @returns {Promise<void>}
      */
     async onClickCreate() {
-        return executeButtonCallback(this.rootRef.el, () => this.createRecord());
+        return executeButtonCallback(this.rootRef(), () => this.createRecord());
     }
 
     /**
@@ -622,7 +623,7 @@ export class BaseMapboxGlController extends Component {
             ...this.props.display,
             controlPanel: {
                 ...controlPanel,
-                layoutActions: !this.hasSelectedRecords,
+                actions: !this.hasSelectedRecords,
             },
         };
     }
@@ -644,8 +645,7 @@ export class BaseMapboxGlController extends Component {
     }
 
     evalViewModifier(modifier, context) {
-        // Treat undefined, null, and empty string as false for modifiers
-        if (modifier === undefined || modifier === null || modifier === '') {
+        if (modifier === null || modifier === undefined || modifier === '') {
             return false;
         }
         context = context || this.model.root.evalContext;
@@ -658,7 +658,7 @@ export class BaseMapboxGlController extends Component {
      * @returns {boolean} True if selectors should be shown
      */
     get hasSelectors() {
-        return this.props.allowSelectors && !this.env.isSmall;
+        return this.props.allowSelectors && !this.uiService.isSmall;
     }
 
     /**
@@ -736,21 +736,4 @@ export class BaseMapboxGlController extends Component {
      */
     async onUpdatedPager() {}
 
-    /**
-     * Scroll to top of content when page changes
-     * Handles both mobile (scrolls root) and desktop (scrolls content area)
-     * @returns {void}
-     */
-    onPageChangeScroll() {
-        if (this.rootRef && this.rootRef.el) {
-            if (this.env.isSmall) {
-                this.rootRef.el.scrollTop = 0;
-            } else {
-                const contentElement = this.rootRef.el.querySelector('.o_content');
-                if (contentElement) {
-                    contentElement.scrollTop = 0;
-                }
-            }
-        }
-    }
 }

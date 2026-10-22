@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
     <t t-name="web_view_base_mapbox_gl.BaseMapboxGlRenderer">
-        <div class="o_mapboxgl_renderer">
+        <div class="o_mapboxgl_renderer ms-3 me-3">
             <div class="o_mapbox_sidebar">
-                <Sidebar t-props="sidebarProps" />
+                <Sidebar t-props="this.sidebarProps" />
             </div>
-            <div class="o_mapboxgl_view" id="o_mapboxgl_view" t-ref="map" />
-            <div class="o_mapboxgl_view_startpoint" t-if="!mapboxState.isMapReady">
-                <t t-if="mapboxState.isCheckingConnection">
-                    <i class="fa fa-spinner fa-spin me-2" />
+            <div class="o_mapboxgl_view rounded-3 mb-2 border" id="o_mapboxgl_view" t-ref="this.mapDivRef" />
+            <div class="o_mapboxgl_view_startpoint" t-if="!this.mapboxState.isMapReady">
+                <t t-if="this.mapboxState.isCheckingConnection">
+                    <i class="oi oi-spin me-2" data-icon="progress_activity" />
                     <span>Checking connection...</span>
                 </t>
-                <t t-elif="mapboxState.isInternetConnected === false">
+                <t t-elif="this.mapboxState.isInternetConnected === false">
                     <div class="text-center">
-                        <i class="fa fa-wifi text-danger d-block mb-2" style="font-size: 2rem;" />
+                        <i class="oi text-danger d-block mb-2" data-icon="wifi" style="font-size: 2rem;" />
                         <span class="d-block mb-2">No internet connection</span>
-                        <button class="btn btn-sm btn-primary" t-on-click="retryConnection">
-                            <i class="fa fa-refresh me-1" />
+                        <button class="btn btn-sm btn-primary" t-on-click="this.retryConnection">
+                            <i class="oi me-1" data-icon="refresh" />
                             Retry
                         </button>
                     </div>
                 </t>
                 <t t-else="">
-                    <i class="fa fa-spinner fa-spin me-2" />
+                    <i class="oi oi-spin me-2" data-icon="progress_activity" />
                     <span>Loading map...</span>
                 </t>
             </div>
-            <Search t-if="mapboxState.isMapReady" />
+            <Search t-if="this.mapboxState.isMapReady" />
         </div>
     </t>
     <t t-name="web_view_base_mapbox_gl.PopupContent">
@@ -63,7 +63,7 @@
                 style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #ecf0f1;"
             >
                 <span style="color: #95a5a6; font-size: 11px;">
-                    <i class="fa fa-hand-pointer-o" />
+                    <i class="oi" data-icon="pan_tool_alt" />
                     Click to view details
                 </span>
                 <span style="color: #7f8c8d; text-transform: uppercase;font-size: 11px;">

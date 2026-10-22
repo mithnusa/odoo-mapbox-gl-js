@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
     <t t-name="web_view_base_mapbox_gl.RecordItem">
-        <tr t-attf-class="{{ props.allowSelectors &amp;&amp; record.selected ? 'table-info' : '' }}">
+        <tr t-attf-class="{{ this.props.allowSelectors &amp;&amp; record.selected ? 'table-info' : '' }}">
             <t t-set="_showMarker" t-value="typeof showMarker === 'boolean' ? showMarker : true" />
-            <t t-if="props.allowSelectors">
+            <t t-if="this.props.allowSelectors">
                 <td style="width: 20px;">
                     <CheckBox
-                        disabled="!props.handleCanSelectRecord"
+                        disabled="!this.props.handleCanSelectRecord"
                         value="record.selected"
                         onChange.alike="() => this.selectRecord(record)"
                     />
@@ -15,14 +15,14 @@
             <td class="o_sidebar_content_cell">
                 <div class="d-flex gap-2 align-items-center cursor-pointer" t-on-click="() => fnPinPointInMap(record)">
                     <div class="o_map_sidebar_record" t-att-data-tooltip="data.other?.title">
-                        <Field id="props.title" name="props.title" record="record" readonly="true" />
+                        <Field id="this.props.title" name="this.props.title" record="record" readonly="true" />
                     </div>
                 </div>
             </td>
             <td>
                 <div class="d-flex align-items-center justify-content-center">
                     <span class="me-2" t-if="_showMarker">
-                        <i class="fa fa-circle" t-attf-style="color: #{data?.other?.__geoColor || 'red'};" />
+                        <i class="oi oi-filled" data-icon="circle" t-attf-style="color: #{data?.other?.__geoColor || 'red'};" />
                     </span>
                     <button
                         type="button"
@@ -31,7 +31,7 @@
                         data-tooltip="Open"
                         t-on-click.prevent="() => fnOpenRecord(record)"
                     >
-                        <i class="fa fa-lg fa-angle-right" />
+                        <i class="oi oi-lg" data-icon="keyboard_arrow_right" />
                     </button>
                 </div>
             </td>
@@ -58,15 +58,15 @@
                                 t-value="(group.group.displayName || 'None') + ' (' + group.group.count + ')' "
                             />
                             <span class="me-2">
-                                <i class="fa fa-caret-right" />
-                                <i class="fa fa-caret-down" />
+                                <i class="oi" data-icon="arrow_right" />
+                                <i class="oi" data-icon="arrow_drop_down" />
                             </span>
                             <span class="ps-1 pe-1" t-out="title" t-att-data-tooltip="title" />
                         </div>
                     </button>
                     <div t-if="group.group.count">
                         <span class="me-1">
-                            <i class="fa fa-circle" t-attf-style="color: #{group.group.groupColor || 'red'};" />
+                            <i class="oi oi-filled" data-icon="circle" t-attf-style="color: #{group.group.groupColor || 'red'};" />
                         </span>
                         <button
                             type="button"
@@ -74,7 +74,7 @@
                             data-tooltip="Open"
                             t-on-click="() => this.actionShowGroupRecords(group)"
                         >
-                            <i class="fa fa-lg fa-angle-double-right" />
+                            <i class="oi oi-lg" data-icon="keyboard_double_arrow_right" />
                         </button>
                     </div>
                 </div>
@@ -90,11 +90,14 @@
                         <table class="table table-sm table-hover mb-0">
                             <tbody>
                                 <t t-foreach="group.group.records" t-as="record" t-key="record.id">
-                                    <t t-call="{{ constructor.recordItemTemplate }}">
-                                        <t t-set="record" t-value="record" />
-                                        <t t-set="data" t-value="record.dataView" />
-                                        <t t-set="showMarker" t-value="false" />
-                                    </t>
+                                    <t
+                                        t-call="{{ this.constructor.recordItemTemplate }}"
+                                        record="record"
+                                        data="record.dataView"
+                                        showMarker="false"
+                                        fnPinPointInMap="fnPinPointInMap"
+                                        fnOpenRecord="fnOpenRecord"
+                                    />
                                 </t>
                                 <tr t-if="group.group.count > group.group.records.length">
                                     <td colspan="99">
@@ -104,7 +107,7 @@
                                             t-on-click.prevent="() => this.actionShowGroupRecords(group)"
                                         >
                                             <span class="me-2">see more</span>
-                                            <i class="fa fa-lg fa-angle-double-right" />
+                                            <i class="oi oi-lg" data-icon="keyboard_double_arrow_right" />
                                         </div>
                                     </td>
                                 </tr>
@@ -116,20 +119,27 @@
         </tr>
     </t>
     <t t-name="web_view_base_mapbox_gl.ListGroupOrRecord">
-        <table class="table table-sm table-hover table-striped">
+        <table class="table table-sm table-hover">
             <tbody>
-                <t t-if="datas.length">
-                    <t t-foreach="datas" t-as="groupOrRecord" t-key="groupOrRecord.key">
+                <t t-if="this.datas.length">
+                    <t t-foreach="this.datas" t-as="groupOrRecord" t-key="groupOrRecord.key">
                         <t t-if="groupOrRecord.group">
-                            <t t-call="{{ constructor.groupItemTemplate }}">
-                                <t t-set="group" t-value="groupOrRecord" />
-                            </t>
+                            <t
+                                t-call="{{ this.constructor.groupItemTemplate }}"
+                                group="groupOrRecord"
+                                fnPinPointInMap="fnPinPointInMap"
+                                fnOpenRecord="fnOpenRecord"
+                            />
                         </t>
                         <t t-else="">
-                            <t t-call="{{ constructor.recordItemTemplate }}">
-                                <t t-set="record" t-value="groupOrRecord.record" />
-                                <t t-set="data" t-value="record.dataView" />
-                            </t>
+                            <t t-set="record" t-value="groupOrRecord.record" />
+                            <t
+                                t-call="{{ this.constructor.recordItemTemplate }}"
+                                record="record"
+                                data="record.dataView"
+                                fnPinPointInMap="fnPinPointInMap"
+                                fnOpenRecord="fnOpenRecord"
+                            />
                         </t>
                     </t>
                 </t>
@@ -147,27 +157,27 @@
         </table>
     </t>
     <t t-name="web_view_base_mapbox_gl.Sidebar">
-        <div class="o_map_sidebar" t-ref="root">
+        <div class="o_map_sidebar">
             <div class="mt-2 mx-1">
                 <div class="d-flex">
-                    <t t-if="props.allowSelectors">
-                        <CheckBox value="props.handleSelectAll" onChange.bind="props.handleToggleSelection" />
+                    <t t-if="this.props.allowSelectors">
+                        <CheckBox value="this.props.handleSelectAll" onChange.bind="this.props.handleToggleSelection" />
                     </t>
-                    <h3 t-if="props.header" t-esc="props.header" />
+                    <h3 t-if="this.props.header" t-out="this.props.header" />
                     <small class="ms-2 text-muted">
                         <span data-tooltip="Only records with geolocation data set are displayed">
-                            <i class="fa fa-info" />
+                            <i class="oi" data-icon="info" />
                         </span>
                     </small>
                 </div>
             </div>
-            <div t-if="(props.unLocatedCount || 0) &gt; 0" class="py-1 border-top border-bottom">
+            <div t-if="(this.props.unLocatedCount || 0) &gt; 0" class="py-1" name="unlocated-records">
                 <div class="d-flex align-items-center justify-content-end px-1">
                     <div>
                         <span>Unlocated</span>
                         <span class="ms-1">
                             <span>(</span>
-                            <span t-out="props.unLocatedCount" />
+                            <span t-out="this.props.unLocatedCount" />
                             <span>)</span>
                         </span>
                     </div>
@@ -175,16 +185,17 @@
                         type="button"
                         class="btn btn-link"
                         data-tooltip="Show Unlocated"
-                        t-on-click.prevent="() => props.showUnlocatedRecords()"
+                        t-on-click.prevent="() => this.props.showUnlocatedRecords()"
                     >
-                        <i class="fa fa-lg fa-angle-double-right" aria-hidden="true" />
+                        <i class="oi oi-lg" data-icon="keyboard_double_arrow_right" aria-hidden="true" />
                     </button>
                 </div>
             </div>
-            <t t-call="{{ constructor.listGroupOrRecordTemplate }}">
-                <t t-set="fnPinPointInMap" t-value="props.pointInMap" />
-                <t t-set="fnOpenRecord" t-value="props.openRecord" />
-            </t>
+            <t
+                t-call="{{ this.constructor.listGroupOrRecordTemplate }}"
+                fnPinPointInMap="this.props.pointInMap"
+                fnOpenRecord="this.props.showRecord"
+            />
         </div>
     </t>
 </templates>

@@ -3,7 +3,8 @@ import { _t } from '@web/core/l10n/translation';
 import { isNull } from '@web/views/utils';
 import { renderToString } from '@web/core/utils/render';
 import { useService, useBus } from '@web/core/utils/hooks';
-import { useRef, useEffect, onWillUpdateProps, onWillRender, markup } from '@odoo/owl';
+import { onWillUpdateProps, signal, t, useProps, markup } from '@odoo/owl';
+import { onWillRender, useLayoutEffect } from '@web/owl2/utils';
 import { BaseMapboxGlComponent } from '@base_mapbox_gl/utils/base_mapbox_gl';
 import { lightenColor, validateGeoJson } from '@base_mapbox_gl/utils/utils';
 import { MapboxGlSearch } from '@base_mapbox_gl/components/mapbox_search/mapbox_search';
@@ -55,25 +56,26 @@ export class BaseMapboxGlRenderer extends BaseMapboxGlComponent {
         Sidebar: BaseMapboxGlSidebar,
         Search: MapboxGlSearch,
     };
-    static props = {
-        archInfo: Object,
-        openRecord: Function,
-        showRecord: Function,
-        showRecordsByDomain: Function,
-        showUnlocatedRecords: Function,
-        unLocatedCount: Number,
-        readonly: Boolean,
-        list: Object,
-        onAdd: { type: Function, optional: true },
-        activeActions: { type: Object, optional: true },
-        allowSelectors: Boolean,
-        viewAttrs: Object,
+    static propsSchema = {
+        archInfo: t.any(),
+        openRecord: t.function(),
+        showRecord: t.function(),
+        showRecordsByDomain: t.function(),
+        showUnlocatedRecords: t.function(),
+        unLocatedCount: t.number(),
+        readonly: t.boolean(),
+        list: t.any(),
+        onAdd: t.function().optional(),
+        activeActions: t.object().optional(),
+        allowSelectors: t.any().optional(false),
+        viewAttrs: t.any(),
     };
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
         super.setup();
         this.validateViewAttributes();
-        this.mapDivRef = useRef('map');
+        this.mapDivRef = signal.ref();
 
         this.uiService = useService('ui');
 
@@ -122,7 +124,18 @@ export class BaseMapboxGlRenderer extends BaseMapboxGlComponent {
         );
 
         // Performance-optimized effects
-        useEffect(
+        //
+        // Depends on both map-readiness AND the data itself: on a fresh
+        // navigation, the model's lazy first load and the Mapbox GL JS
+        // asset/style load race each other, and onWillUpdatePropsRenderMarkers()
+        // below bails out early while the map isn't ready yet (without
+        // recording the data as "seen"). Whichever of the two finishes last
+        // must still trigger a paint, so the data is also a dependency here —
+        // otherwise, if the model resolves first, this effect's only
+        // dependency (mapIsReady) never changes again once the map becomes
+        // ready, and nothing ever paints the already-loaded records until
+        // something else (e.g. a reload) forces another update.
+        useLayoutEffect(
             (mapIsReady) => {
                 if (mapIsReady) {
                     this.debounceRenderGeolocationData();
@@ -130,7 +143,11 @@ export class BaseMapboxGlRenderer extends BaseMapboxGlComponent {
             },
             () => {
                 const mapIsReady = this.isMapboxReady();
-                return [mapIsReady];
+                const { list } = this.props;
+                const dataSignature = list.isGrouped
+                    ? `g:${list.groups?.length ?? 0}`
+                    : `r:${list.records.length}`;
+                return [mapIsReady, dataSignature];
             }
         );
 
@@ -1107,6 +1124,7 @@ export class BaseMapboxGlRenderer extends BaseMapboxGlComponent {
             toggleGroup: this.toggleGroup.bind(this),
             renderGroupedRecordsFitBounds: this._renderGroupedRecordsFitBounds.bind(this),
             openRecord: this.props.openRecord.bind(this),
+            showRecord: this.props.showRecord.bind(this),
             showRecordsByDomain: this.props.showRecordsByDomain.bind(this),
             showUnlocatedRecords: this.props.showUnlocatedRecords.bind(this),
             pointInMap: this.pointInMap.bind(this),

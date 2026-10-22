@@ -14,20 +14,16 @@ export class MapboxGlSearchBarMenu extends SearchBarMenu {
 
     /**
      * @override
+     * Blocks activation of a second group-by before the search model is updated,
+     * keeping the map view's single-group constraint enforced at the UI layer.
      */
-    onGroupBySelected() {
-        super.onGroupBySelected(...arguments);
-        let number_of_active_groups = 0;
-        this.groupByItems.forEach((value) => {
-            if (value.isActive) {
-                number_of_active_groups++;
-            }
-        });
-        if (number_of_active_groups > 1) {
-            this.notificationService.add(_t('Only one active group is allowed at a time.'), {
-                type: 'info',
-            });
+    onGroupBySelected({ itemId, optionId }) {
+        const [item] = this.env.searchModel.getSearchItems((searchItem) => searchItem.id === itemId);
+        if (!item?.isActive && this.groupByItems.some((v) => v.isActive)) {
+            this.notificationService.add(_t('You can only have one active group at a time.'), { type: 'warning' });
+            return;
         }
+        super.onGroupBySelected({ itemId, optionId });
     }
 }
 

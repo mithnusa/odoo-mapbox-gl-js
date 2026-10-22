@@ -9,7 +9,7 @@ class IrUiView(models.Model):
 
     def _get_view_info(self):
         view_info = super()._get_view_info()
-        view_info['mapbox_gl'] = {'icon': 'fa fa-map text-800'}
+        view_info['mapbox_gl'] = {'icon': 'map'}
         return view_info
 
     def _validate_tag_mapbox_gl(self, node, name_manager, node_info):
@@ -51,3 +51,9 @@ class IrUiView(models.Model):
                 ),
                 node,
             )
+
+    def _modifiers_from_model(self, node):
+        modifier_names = super()._modifiers_from_model(node)
+        if node.tag == "mapbox_gl":
+            modifier_names += ["readonly", "required"]
+        return modifier_names

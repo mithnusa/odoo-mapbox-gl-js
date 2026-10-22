@@ -1,5 +1,5 @@
 import { _t } from '@web/core/l10n/translation';
-import { Component } from '@odoo/owl';
+import { Component, t, useProps } from '@odoo/owl';
 import { CheckBox } from '@web/core/checkbox/checkbox';
 import { Field } from '@web/views/fields/field';
 import { useService } from '@web/core/utils/hooks';
@@ -10,26 +10,28 @@ export class BaseMapboxGlSidebar extends Component {
     static recordItemTemplate = 'web_view_base_mapbox_gl.RecordItem';
     static groupItemTemplate = 'web_view_base_mapbox_gl.GroupItem';
     static components = { CheckBox, Field };
-    static props = {
-        header: String,
-        title: { type: String, optional: true },
-        unLocatedCount: Number,
-        subTitle: String,
-        getGroupsOrRecords: Function,
-        toggleGroup: Function,
-        renderGroupedRecordsFitBounds: Function,
-        openRecord: Function,
-        showRecordsByDomain: Function,
-        pointInMap: Function,
-        deleteGroupRecords: Function,
-        handleToggleSelection: Function,
-        handleCanSelectRecord: Boolean,
-        handleSelectAll: Boolean,
-        handleToggleRecordSelection: Function,
-        showUnlocatedRecords: Function,
-        allowSelectors: Boolean,
-        isGrouped: Boolean,
+    static propsSchema = {
+        header: t.string(),
+        title: t.string().optional(),
+        unLocatedCount: t.number(),
+        subTitle: t.string(),
+        getGroupsOrRecords: t.function(),
+        toggleGroup: t.function(),
+        renderGroupedRecordsFitBounds: t.function(),
+        openRecord: t.function(),
+        showRecord: t.function(),
+        showRecordsByDomain: t.function(),
+        pointInMap: t.function(),
+        deleteGroupRecords: t.function(),
+        handleToggleSelection: t.function(),
+        handleCanSelectRecord: t.boolean(),
+        handleSelectAll: t.boolean(),
+        handleToggleRecordSelection: t.function(),
+        showUnlocatedRecords: t.function(),
+        allowSelectors: t.boolean(),
+        isGrouped: t.boolean(),
     };
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
         this.notificationService = useService('notification');
