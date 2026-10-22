@@ -23,7 +23,7 @@ Integration tests (end-to-end ORM search against a real JSONB column) live in:
 They require the contacts_area_mapbox_gl module to be installed.
 """
 import json
-from unittest.mock import Mock
+from unittest.mock import MagicMock, Mock
 
 from odoo.tests.common import BaseCase
 from odoo.tools import SQL
@@ -226,9 +226,8 @@ class TestSearchableJsonField(BaseCase):
     def setUp(self):
         super().setUp()
         self.field = SearchableJson()
-        self.mock_model = Mock()
-        self.mock_model._field_to_sql = Mock(return_value=SQL("test_table.geojson"))
-        self.mock_query = Mock()
+        self.mock_table = MagicMock()
+        self.mock_table.__getitem__.return_value = SQL("test_table.geojson")
 
     def test_json_eq_sql_generation_with_wrapped_value(self):
         """Test SQL generation for 'in' operator with wrapped JsonValue."""
@@ -236,7 +235,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet([wrapped_value])
 
         result = self.field._condition_to_sql(
-            'geojson', 'in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -250,7 +249,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet([wrapped_value])
 
         result = self.field._condition_to_sql(
-            'geojson', 'not in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'not in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -265,7 +264,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet([wrapped_value])
 
         result = self.field._condition_to_sql(
-            'geojson', 'in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -279,7 +278,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet([wrapped_value])
 
         result = self.field._condition_to_sql(
-            'geojson', 'not in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'not in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -295,7 +294,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet(['test_string'])
 
         result = self.field._condition_to_sql(
-            'geojson', 'not in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'not in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -308,7 +307,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet()
 
         result = self.field._condition_to_sql(
-            'geojson', 'in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -321,7 +320,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet()
 
         result = self.field._condition_to_sql(
-            'geojson', 'not in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'not in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -336,7 +335,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet([val1, val2])
 
         result = self.field._condition_to_sql(
-            'geojson', 'in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -351,7 +350,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet([val1, val2])
 
         result = self.field._condition_to_sql(
-            'geojson', 'not in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'not in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -374,7 +373,7 @@ class TestSearchableJsonField(BaseCase):
         values = OrderedSet(['test_string'])
 
         result = self.field._condition_to_sql(
-            'geojson', 'in', values, self.mock_model, 'test_table', self.mock_query
+            self.mock_table, 'geojson', 'in', values
         )
 
         self.assertIsInstance(result, SQL)
@@ -448,14 +447,13 @@ class TestEdgeCases(BaseCase):
     def test_misapplied_custom_operator_raises_error(self):
         """Test that custom operators raise ValueError when they bypass optimization."""
         field = SearchableJson()
-        mock_model = Mock()
-        mock_model._field_to_sql = Mock(return_value=SQL("test_table.geojson"))
-        mock_query = Mock()
+        mock_table = MagicMock()
+        mock_table.__getitem__.return_value = SQL("test_table.geojson")
 
         for operator in ('json_eq', 'json_ne', 'json_contains', 'json_not_contains'):
             with self.assertRaises(AssertionError) as context:
                 field._condition_to_sql(
-                    'geojson', operator, 'value', mock_model, 'test_table', mock_query
+                    mock_table, 'geojson', operator, 'value'
                 )
             self.assertIn(
                 'reached _condition_to_sql without being rewritten',
