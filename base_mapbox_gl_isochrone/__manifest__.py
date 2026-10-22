@@ -33,7 +33,7 @@ and expose the recompute action in its own views.
     "website": "https://www.mithnusa.com",
     "support": "yopiangi@gmail.com",
     "category": "Hidden",
-    "version": "19.0.1.0.1",
+    "version": "20.0.1.0.0",
     "depends": ["base_mapbox_gl", "web_view_mapbox_gl_draw"],
     "assets": {
         "web.assets_backend": [

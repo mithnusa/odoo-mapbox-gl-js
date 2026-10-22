@@ -2,41 +2,45 @@
 <templates xml:space="preserve">
     <div t-name="base_mapbox_gl_isochrone.GeoJsonIsochroneField">
         <div class="o_mapboxgl_renderer">
-            <div class="o_mapboxgl_view border rounded-2" id="o_mapboxgl_view_widget_geojson_isochrone" t-ref="map" />
-            <div class="o_mapboxgl_view_startpoint" t-if="!mapboxState.isMapReady">
-                <t t-if="mapboxState.isCheckingConnection">
-                    <i class="fa fa-spinner fa-spin me-2" />
+            <div
+                class="o_mapboxgl_view border rounded-2"
+                id="o_mapboxgl_view_widget_geojson_isochrone"
+                t-ref="this.mapRef"
+            />
+            <div class="o_mapboxgl_view_startpoint" t-if="!this.mapboxState.isMapReady">
+                <t t-if="this.mapboxState.isCheckingConnection">
+                    <i class="oi oi-spin me-2" data-icon="progress_activity" />
                     <span>Checking connection...</span>
                 </t>
-                <t t-elif="mapboxState.isInternetConnected === false">
+                <t t-elif="this.mapboxState.isInternetConnected === false">
                     <div class="text-center">
-                        <i class="fa fa-wifi text-danger d-block mb-2" style="font-size: 2rem;" />
+                        <i class="oi text-danger d-block mb-2" data-icon="wifi" style="font-size: 2rem;" />
                         <span class="d-block mb-2">No internet connection</span>
-                        <button class="btn btn-sm btn-primary" t-on-click="retryConnection">
-                            <i class="fa fa-refresh me-1" />
+                        <button class="btn btn-sm btn-primary" t-on-click="this.retryConnection">
+                            <i class="oi me-1" data-icon="refresh" />
                             Retry
                         </button>
                     </div>
                 </t>
                 <t t-else="">
-                    <i class="fa fa-spinner fa-spin me-2" />
+                    <i class="oi oi-spin me-2" data-icon="progress_activity" />
                     <span>Loading map...</span>
                 </t>
             </div>
-            <Search t-if="mapboxState.isMapLoaded" />
+            <Search t-if="this.mapboxState.isMapLoaded" />
         </div>
-        <div t-if="isochroneArea" class="o_mapboxgl_isochrone_area my-1 smaller text-700">
+        <div t-if="this.isochroneArea" class="o_mapboxgl_isochrone_area my-1 smaller text-700">
             <p class="mb-0">
                 <span>Coverage area:</span>
-                <span class="ms-1" t-out="isochroneArea.metric" />
+                <span class="ms-1" t-out="this.isochroneArea.metric" />
                 <span class="mx-1">|</span>
-                <span t-out="isochroneArea.imperial" />
+                <span t-out="this.isochroneArea.imperial" />
             </p>
-            <p class="mb-1" t-if="isochroneReach">
+            <p class="mb-1" t-if="this.isochroneReach">
                 <span>Reaches up to</span>
-                <span class="ms-1" t-out="isochroneReach.metric" />
+                <span class="ms-1" t-out="this.isochroneReach.metric" />
                 <span class="mx-1">|</span>
-                <span t-out="isochroneReach.imperial" />
+                <span t-out="this.isochroneReach.imperial" />
             </p>
         </div>
     </div>

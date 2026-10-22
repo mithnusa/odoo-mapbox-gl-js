@@ -271,7 +271,7 @@ class BaseMapboxIsochrone(models.AbstractModel):
         self.ensure_one()
         # sudo: access_token is a global system parameter, not user-specific data.
         ir_config_sudo = self.env['ir.config_parameter'].sudo()
-        mapbox_token = ir_config_sudo.get_param(
+        mapbox_token = ir_config_sudo.get_str(
             'base_mapbox_gl.access_token', default=''
         )
         if not mapbox_token:

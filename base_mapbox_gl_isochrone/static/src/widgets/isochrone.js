@@ -3,7 +3,7 @@ import { registry } from '@web/core/registry';
 import { user } from '@web/core/user';
 import { debounce } from '@web/core/utils/timing';
 import { standardFieldProps } from '@web/views/fields/standard_field_props';
-import { useRef, onWillUpdateProps } from '@odoo/owl';
+import { onWillUpdateProps, signal, useProps, t } from '@odoo/owl';
 
 import { MapboxGlSearch } from '@base_mapbox_gl/components/mapbox_search/mapbox_search';
 import { BaseMapboxGlComponent } from '@base_mapbox_gl/utils/base_mapbox_gl';
@@ -28,23 +28,21 @@ function forEachPosition(coordinates, callback) {
 
 export class MapboxIsochroneField extends BaseMapboxGlComponent {
     static template = 'base_mapbox_gl_isochrone.GeoJsonIsochroneField';
-    static defaultProps = {
-        dynamicPlaceholder: false,
-    };
     static components = {
         Search: MapboxGlSearch,
     };
-    static props = {
+    static propsSchema = {
         ...standardFieldProps,
-        mapStyleUrl: { type: String, optional: true },
-        latField: { type: String, optional: true },
-        lonField: { type: String, optional: true },
+        mapStyleUrl: t.string().optional(true),
+        latField: t.string().optional(true),
+        lonField: t.string().optional(true),
     };
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
         super.setup();
         this.validatePropsOptions();
-        this.mapRef = useRef('map');
+        this.mapRef = signal.ref();
         this.debounceRenderGeoJsonIsochrone = debounce(this.renderGeoJsonIsochrone.bind(this), 300);
 
         onWillUpdateProps(() => {
