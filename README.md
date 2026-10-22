@@ -1,13 +1,13 @@
 # Odoo Mapbox GL JS Integration
 
-[![Odoo 19.0](https://img.shields.io/badge/Odoo-19.0-875A7B?logo=odoo&logoColor=white)](https://www.odoo.com/)
-[![pre-commit](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/pre-commit.yml/badge.svg?branch=19.0)](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/pre-commit.yml)
-[![Coverage Insights](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/coverage.yml/badge.svg?branch=19.0)](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/coverage.yml?query=branch%3A19.0)
+[![Odoo 20.0](https://img.shields.io/badge/Odoo-20.0-875A7B?logo=odoo&logoColor=white)](https://www.odoo.com/)
+[![pre-commit](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/pre-commit.yml/badge.svg?branch=main)](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/pre-commit.yml)
+[![Coverage Insights](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/coverage.yml/badge.svg?branch=main)](https://github.com/mithnusa/odoo-mapbox-gl-js/actions/workflows/coverage.yml?query=branch%3Amain)
 [![Mapbox GL JS](https://img.shields.io/badge/Mapbox_GL_JS-v3.33.0-000000?logo=mapbox&logoColor=white)](https://docs.mapbox.com/mapbox-gl-js/api/)
 [![Turf.js](https://img.shields.io/badge/Turf.js-v7.4.0-6ED0F0)](https://turfjs.org/)
 [![License: LGPL-3](https://img.shields.io/badge/License-LGPL_3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
 
-A suite of Odoo 19.0 addons that brings interactive Mapbox GL JS maps to Odoo — a reusable map view framework (GeoJSON shapes and lat/lng coordinates), a GeoJSON drawing widget for form fields, a reachable-area (isochrone) building block, and the application modules that consume them: Contacts, Project/Task, portal address pinpointing, and a standalone Route Planner app.
+A suite of Odoo 20.0 addons that brings interactive Mapbox GL JS maps to Odoo — a reusable map view framework (GeoJSON shapes and lat/lng coordinates), a GeoJSON drawing widget for form fields, a reachable-area (isochrone) building block, and the application modules that consume them: Contacts, Project/Task, portal address pinpointing, and a standalone Route Planner app.
 
 All Mapbox JS libraries (Mapbox GL JS v3.33.0, Mapbox GL Draw v1.5.2, Turf.js v7.4.0, Mapbox Search Box SDK v1.6.0) are loaded from their official CDNs at pinned versions — no local bundling or separate installation required.
 
@@ -80,11 +80,11 @@ graph LR
 
 ### Foundation
 
-**[base_mapbox_gl](base_mapbox_gl/README.md)** `19.0.1.1.0`
+**[base_mapbox_gl](base_mapbox_gl/README.md)** `20.0.1.0.0`
 
 Core configuration module. Adds a Mapbox GL JS section to General Settings for the access token and default display options. Loads Mapbox GL JS from Mapbox's CDN at a pinned version with a dynamic asset loader and error handling. Provides a shared map core (styles, language switching, geocoding, display controls), a reusable `BaseMapboxGlComponent`/`MapboxGlMixin` for building new map views or widgets, a Mapbox Search component for address lookup, and 10 built-in map styles.
 
-**[web_view_base_mapbox_gl](web_view_base_mapbox_gl/README.md)** `19.0.1.0.0`
+**[web_view_base_mapbox_gl](web_view_base_mapbox_gl/README.md)** `20.0.1.0.0`
 
 Foundation for all Mapbox map views — registers the `mapbox_gl` view type alongside form, list, and kanban. Provides:
 
@@ -97,7 +97,7 @@ Foundation for all Mapbox map views — registers the `mapbox_gl` view type alon
 
 This is a technical dependency with no standalone UI — install `web_view_mapbox_gl_draw` or `web_view_mapbox_gl_geolocate` to display maps.
 
-**[web_widget_mapbox_gl](web_widget_mapbox_gl/README.md)** `19.0.1.0.0`
+**[web_widget_mapbox_gl](web_widget_mapbox_gl/README.md)** `20.0.1.0.0`
 
 Form field widget (`mapbox_gl_draw_geojson`) for drawing and editing GeoJSON geometries embedded directly in form views. Features:
 
@@ -111,7 +111,7 @@ Form field widget (`mapbox_gl_draw_geojson`) for drawing and editing GeoJSON geo
 
 ### View Types
 
-**[web_view_mapbox_gl_draw](web_view_mapbox_gl_draw/README.md)** `19.0.1.0.0`
+**[web_view_mapbox_gl_draw](web_view_mapbox_gl_draw/README.md)** `20.0.1.0.0`
 
 Provides the `mapbox_gl_draw` view type for records that store GeoJSON geometry. Features:
 
@@ -123,7 +123,7 @@ Provides the `mapbox_gl_draw` view type for records that store GeoJSON geometry.
 - Auto-fit bounds with animated transitions
 - Ships an example module (`example/`) demonstrating a full integration with a GeoJSON upload wizard
 
-**[web_view_mapbox_gl_geolocate](web_view_mapbox_gl_geolocate/README.md)** `19.0.1.0.1`
+**[web_view_mapbox_gl_geolocate](web_view_mapbox_gl_geolocate/README.md)** `20.0.1.0.0`
 
 Provides the `mapbox_gl_geolocate` view type for records with separate latitude/longitude fields. Features:
 
@@ -135,7 +135,7 @@ Provides the `mapbox_gl_geolocate` view type for records with separate latitude/
 
 ### Technical Extensions
 
-**[base_mapbox_gl_isochrone](base_mapbox_gl_isochrone/README.md)** `19.0.1.0.1`
+**[base_mapbox_gl_isochrone](base_mapbox_gl_isochrone/README.md)** `20.0.1.0.0`
 
 Reusable "reachable within N minutes" mixin backed by the Mapbox Isochrone API. Adds an abstract `base.mapbox.isochrone` model that any model with coordinates can inherit. Features:
 
@@ -150,7 +150,7 @@ This is a technical dependency with no standalone UI — a consuming module must
 
 ### Applications
 
-**[contacts_mapbox_gl](contacts_mapbox_gl/README.md)** `19.0.1.0.0`
+**[contacts_mapbox_gl](contacts_mapbox_gl/README.md)** `20.0.1.0.0`
 
 Adds a `mapbox_gl_geolocate` map view directly inside Contacts. Features:
 
@@ -160,7 +160,7 @@ Adds a `mapbox_gl_geolocate` map view directly inside Contacts. Features:
 - Popup cards showing contact name and address on hover
 - Scheduled cron (every 12 hours) that auto-geocodes contacts with an address but no coordinates yet
 
-**[project_mapbox_gl](project_mapbox_gl/README.md)** `19.0.1.0.1`
+**[project_mapbox_gl](project_mapbox_gl/README.md)** `20.0.1.0.0`
 
 Extends Project with interactive Mapbox map views and GeoJSON drawing for Projects and Tasks. Features:
 
@@ -169,7 +169,7 @@ Extends Project with interactive Mapbox map views and GeoJSON drawing for Projec
 - Site tab on the Project form — full drawing canvas (polygons, lines, points) with automatic area calculation, a color picker, and an HTML notes field
 - Site tab on the Task form — same drawing canvas, plus a read-only display of the parent project's area
 
-**[website_portal_pinpoint_address_mapbox_gl](website_portal_pinpoint_address_mapbox_gl/README.md)** `19.0.1.0.0`
+**[website_portal_pinpoint_address_mapbox_gl](website_portal_pinpoint_address_mapbox_gl/README.md)** `20.0.1.0.0`
 
 Adds an interactive map to the portal "My Address" form. Features:
 
@@ -179,7 +179,7 @@ Adds an interactive map to the portal "My Address" form. Features:
 
 ### Standalone
 
-**[route_planner](route_planner/README.md)** `19.0.1.2.1`
+**[route_planner](route_planner/README.md)** `20.0.1.0.0`
 
 Top-level application for multi-stop route planning — no Mapbox dependency. Provides the Route Planner menu, route/stop models, lifecycle, fleet integration, and the TSP heuristics (nearest-neighbor + 2-opt) intended for a future Mapbox-based optimization layer. Features:
 
@@ -233,7 +233,7 @@ Dependencies are resolved automatically — installing any module will install i
 
 ## Requirements
 
-- **Odoo** 19.0
+- **Odoo** 20.0
 - **Browser** — any modern browser with WebGL support
 - **Mapbox access token** — public token (`pk.`) from [account.mapbox.com](https://account.mapbox.com/)
 
