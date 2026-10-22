@@ -51,7 +51,7 @@ Key Features
     'website': 'https://www.mithnusa.com',
     'support': 'yopiangi@gmail.com',
     'category': 'Hidden',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'depends': ['web_view_base_mapbox_gl'],
     'assets': {
         'web.assets_backend': [

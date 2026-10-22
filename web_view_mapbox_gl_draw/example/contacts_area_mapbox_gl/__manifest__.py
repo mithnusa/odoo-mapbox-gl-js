@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     'name': 'Partners GeoJSON (Mapbox demo implementation)',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'author': 'Yopi Angi',
     'license': 'LGPL-3',
     'maintainer': 'Yopi Angi<yopiangi@gmail.com>',
@@ -24,7 +24,7 @@ Features
     ],
     'website': 'https://www.mithnusa.com',
     'data': [
-        'security/ir.model.access.csv',
+        'security/ir.access.csv',
         'views/res_partner_geojson.xml',
         'wizard/geojson_upload_wizard_views.xml',
     ],

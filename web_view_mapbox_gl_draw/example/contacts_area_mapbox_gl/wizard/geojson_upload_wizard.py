@@ -58,9 +58,7 @@ class GeoJsonUploadWizard(models.TransientModel):
         if self.geojson_file and self.feature_name:
             try:
                 # Decode the file
-                file_content = base64.b64decode(self.geojson_file).decode(
-                    'utf-8'
-                )
+                file_content = self.geojson_file.decode("utf-8")
                 geojson_data = json.loads(file_content)
 
                 # Validate GeoJSON structure
@@ -74,16 +72,12 @@ class GeoJsonUploadWizard(models.TransientModel):
                 preview = self._create_preview_summary(features)
                 self.preview_data = preview
 
-            except UnicodeDecodeError:
-                raise UserError(
-                    self.env._(
-                        'Invalid file encoding. Please upload a UTF-8 encoded file.'
-                    )
-                )
             except json.JSONDecodeError as e:
                 raise UserError(self.env._('Invalid JSON format: %s', str(e)))
             except ValidationError as e:
                 raise UserError(str(e))
+            except UserError:
+                raise
             except Exception as e:
                 _logger.error('Error processing GeoJSON file: %s', e)
                 raise UserError(
@@ -215,7 +209,7 @@ class GeoJsonUploadWizard(models.TransientModel):
 
         try:
             # Decode and parse the file
-            file_content = base64.b64decode(self.geojson_file).decode('utf-8')
+            file_content = self.geojson_file.decode('utf-8')
             geojson_data = json.loads(file_content)
 
             # Validate again
@@ -227,6 +221,8 @@ class GeoJsonUploadWizard(models.TransientModel):
                 'tag': 'reload',
             }
 
+        except UserError:
+            raise
         except Exception as e:
             _logger.error('Error importing GeoJSON: %s', e)
             raise UserError(self.env._('Error importing GeoJSON: %s', str(e)))
