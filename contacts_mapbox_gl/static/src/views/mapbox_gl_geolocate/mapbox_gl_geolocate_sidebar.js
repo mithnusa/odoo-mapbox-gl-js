@@ -1,9 +1,10 @@
+import { t } from '@odoo/owl';
 import { BaseMapboxGlSidebar } from '@web_view_base_mapbox_gl/map_base/map_base_sidebar';
 
 export class MapboxGlContactSidebar extends BaseMapboxGlSidebar {
-    static props = {
-        ...BaseMapboxGlSidebar.props,
-        fieldAvatar: { type: String, optional: true },
+    static propsSchema = {
+        ...BaseMapboxGlSidebar.propsSchema,
+        fieldAvatar: t.string().optional(),
     };
     static recordItemTemplate = 'contacts_mapbox_gl.RecordItemAvatar';
 
