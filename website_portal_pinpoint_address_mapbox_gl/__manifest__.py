@@ -23,7 +23,7 @@ Key Features
     'website': 'https://www.mithnusa.com',
     'support': 'yopiangi@gmail.com',
     'category': 'Website',
-    'version': '19.0.1.0.0',
+    'version': '20.0.1.0.0',
     'depends': ['website', 'portal', 'base_mapbox_gl'],
     'data': [
         'views/address_templates.xml',

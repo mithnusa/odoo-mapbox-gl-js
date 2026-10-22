@@ -42,7 +42,7 @@ export class AddressFormPinPointAddressMapbox extends Interaction {
                 button.classList.remove('btn-outline-warning');
                 button.classList.add('btn-outline-success');
                 button.innerHTML = `
-                <i class="fa fa-map-marker fa-fw" aria-hidden="true"></i>
+                <i class="oi oi-fw" data-icon="location_on" aria-hidden="true"></i>
                 <span>${_t('Update Location on Map')}</span>
                 `;
             }

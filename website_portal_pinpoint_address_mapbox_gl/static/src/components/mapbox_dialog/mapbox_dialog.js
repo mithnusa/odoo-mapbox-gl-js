@@ -1,4 +1,4 @@
-import { onMounted, useRef } from '@odoo/owl';
+import { onMounted, signal, t, useProps } from '@odoo/owl';
 import { Dialog } from '@web/core/dialog/dialog';
 import { _t } from '@web/core/l10n/translation';
 import { useService } from '@web/core/utils/hooks';
@@ -10,29 +10,26 @@ export class MapboxPinpointAddressDialog extends BaseMapboxGlComponent {
     static components = {
         Dialog,
     };
-    static props = {
-        title: { type: String, optional: true },
-        close: Function,
-        callbackUpdateLocation: Function,
-        partnerId: Number,
-        partnerLatitude: Number,
-        partnerLongitude: Number,
-        partnerFullAddress: String,
-        partnerSimplifiedAddress: String,
+    static propsSchema = {
+        title: t.string().optional(_t('Pinpoint Address')),
+        close: t.function(),
+        callbackUpdateLocation: t.function(),
+        partnerId: t.number(),
+        partnerLatitude: t.number(),
+        partnerLongitude: t.number(),
+        partnerFullAddress: t.string(),
+        partnerSimplifiedAddress: t.string(),
     };
-
-    static defaultProps = {
-        title: _t('Pinpoint Address'),
-    };
+    props = useProps(this.constructor.propsSchema);
 
     setup() {
         super.setup();
         this.notificationService = useService('notification');
-        this.mapboxRef = useRef('mapboxRef');
+        this.mapboxRef = signal.ref();
         this.pinPointMarker = null;
 
         onMounted(() => {
-            const el = this.mapboxRef.el;
+            const el = this.mapboxRef();
             if (!el) return;
             // flex-grow on inner elements only works when every ancestor in the
             // chain has a definite height (not just max-height). Bootstrap modals

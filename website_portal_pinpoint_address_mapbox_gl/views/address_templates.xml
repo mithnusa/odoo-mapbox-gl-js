@@ -17,7 +17,7 @@
                     t-att-data-partner-full-address="partner_full_address"
                     t-att-data-partner-simplified-address="partner_simplified_address"
                 >
-                    <i class="fa fa-map-marker fa-fw" aria-hidden="true" />
+                    <i class="oi oi-fw" data-icon="location_on" aria-hidden="true" />
                     <t t-if="has_pinpoint_address">
                         <span>Update Location on Map</span>
                     </t>
