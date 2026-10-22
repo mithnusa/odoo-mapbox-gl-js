@@ -2,7 +2,7 @@
 {
     'name': 'Project Mapbox GeoJSON',
     'summary': 'Add interactive Mapbox map views and GeoJSON drawing to Projects and Tasks',
-    'version': '19.0.1.0.1',
+    'version': '20.0.1.0.0',
     'author': 'Yopi Angi <yopiangi@gmail.com>',
     'license': 'LGPL-3',
     'maintainer': 'Yopi Angi <yopiangi@gmail.com>',

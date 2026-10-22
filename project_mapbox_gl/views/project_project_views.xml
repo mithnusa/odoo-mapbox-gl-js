@@ -24,7 +24,7 @@
         <field name="model">project.project</field>
         <field name="inherit_id" ref="project.edit_project" />
         <field name="arch" type="xml">
-            <xpath expr="//page[1]" position="after">
+            <xpath expr="//page[@name='description']" position="after">
                 <page string="Site">
                     <field
                         name="mapbox_geojson"
