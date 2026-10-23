@@ -81,6 +81,9 @@ export class BaseMapboxGlRenderer extends BaseMapboxGlComponent {
 
         this.selectedFeatureIds = new Set();
 
+        // Check if the current Odoo instance is Enterprise edition
+        this.isEnterprise = odoo.info?.isEnterprise ?? false;
+
         // Mapbox-specific state
         this.hoveredFeatureId = null;
         this.mouseMoveDebounce = null;
@@ -144,9 +147,7 @@ export class BaseMapboxGlRenderer extends BaseMapboxGlComponent {
             () => {
                 const mapIsReady = this.isMapboxReady();
                 const { list } = this.props;
-                const dataSignature = list.isGrouped
-                    ? `g:${list.groups?.length ?? 0}`
-                    : `r:${list.records.length}`;
+                const dataSignature = list.isGrouped ? `g:${list.groups?.length ?? 0}` : `r:${list.records.length}`;
                 return [mapIsReady, dataSignature];
             }
         );

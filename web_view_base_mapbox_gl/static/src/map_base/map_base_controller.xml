@@ -38,11 +38,19 @@
                     </t>
                 </t>
                 <t t-set-slot="control-panel-actions">
-                    <SearchBar t-if="!this.offlinePlugin.isOffline()" toggler="this.searchBarToggler" autofocus="this.firstLoad" />
+                    <SearchBar
+                        t-if="!this.offlinePlugin.isOffline()"
+                        toggler="this.searchBarToggler"
+                        autofocus="this.firstLoad"
+                    />
                     <OfflineSearchBar t-else="" toggler="this.searchBarToggler" autofocus="this.firstLoad" />
                 </t>
                 <t t-set-slot="control-panel-navigation-additional">
-                    <t t-if="!this.hasSelectedRecords" t-component="this.searchBarToggler.component" t-props="this.searchBarToggler.props" />
+                    <t
+                        t-if="!this.hasSelectedRecords"
+                        t-component="this.searchBarToggler.component"
+                        t-props="this.searchBarToggler.props"
+                    />
                 </t>
                 <t t-set-slot="control-panel-additional-actions">
                     <CogMenu t-if="!this.hasSelectedRecords" />

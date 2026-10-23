@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <templates xml:space="preserve">
     <t t-name="web_view_base_mapbox_gl.BaseMapboxGlRenderer">
-        <div class="o_mapboxgl_renderer ms-3 me-3">
-            <div class="o_mapbox_sidebar">
+        <div t-attf-class="o_mapboxgl_renderer {{ this.isEnterprise ? 'ms-1 me-2' : '' }}">
+            <div class="o_mapbox_sidebar px-2">
                 <Sidebar t-props="this.sidebarProps" />
             </div>
-            <div class="o_mapboxgl_view rounded-3 mb-2 border" id="o_mapboxgl_view" t-ref="this.mapDivRef" />
+            <div
+                t-attf-class="o_mapboxgl_view {{ this.isEnterprise ? 'rounded-3 mb-2 border' : '' }}"
+                id="o_mapboxgl_view"
+                t-ref="this.mapDivRef"
+            />
             <div class="o_mapboxgl_view_startpoint" t-if="!this.mapboxState.isMapReady">
                 <t t-if="this.mapboxState.isCheckingConnection">
                     <i class="oi oi-spin me-2" data-icon="progress_activity" />

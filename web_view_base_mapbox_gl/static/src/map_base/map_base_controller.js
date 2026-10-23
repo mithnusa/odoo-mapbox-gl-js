@@ -735,5 +735,4 @@ export class BaseMapboxGlController extends Component {
      * Override in child classes to perform actions after pagination changes
      */
     async onUpdatedPager() {}
-
 }

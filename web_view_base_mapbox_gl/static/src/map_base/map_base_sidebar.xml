@@ -22,7 +22,11 @@
             <td>
                 <div class="d-flex align-items-center justify-content-center">
                     <span class="me-2" t-if="_showMarker">
-                        <i class="oi oi-filled" data-icon="circle" t-attf-style="color: #{data?.other?.__geoColor || 'red'};" />
+                        <i
+                            class="oi oi-filled"
+                            data-icon="circle"
+                            t-attf-style="color: #{data?.other?.__geoColor || 'red'};"
+                        />
                     </span>
                     <button
                         type="button"
@@ -66,7 +70,11 @@
                     </button>
                     <div t-if="group.group.count">
                         <span class="me-1">
-                            <i class="oi oi-filled" data-icon="circle" t-attf-style="color: #{group.group.groupColor || 'red'};" />
+                            <i
+                                class="oi oi-filled"
+                                data-icon="circle"
+                                t-attf-style="color: #{group.group.groupColor || 'red'};"
+                            />
                         </span>
                         <button
                             type="button"
