@@ -2,9 +2,9 @@ name: Code Coverage
 
 on:
   push:
-    branches: ["main"]
+    branches: ["20.0"]
   pull_request:
-    branches: ["main"]
+    branches: ["20.0"]
 
 permissions:
   contents: read
