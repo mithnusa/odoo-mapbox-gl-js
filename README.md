@@ -26,7 +26,7 @@ All Mapbox JS libraries (Mapbox GL JS v3.33.0, Mapbox GL Draw v1.5.2, Turf.js v7
 | Contacts map | `contacts_mapbox_gl` |
 | Project & Task map views + site drawing | `project_mapbox_gl` |
 | Portal address pinpointing | `website_portal_pinpoint_address_mapbox_gl` |
-| Multi-stop route planning (no map yet — see [Roadmap](#roadmap)) | `route_planner` |
+| Multi-stop route planning (no map yet — see [Related Add-ons](#related-add-ons)) | `route_planner` |
 
 ---
 
@@ -146,7 +146,7 @@ Reusable "reachable within N minutes" mixin backed by the Mapbox Isochrone API. 
 - Switching between time and distance clears the stale zone with a warning
 - Recompute is gated by edit access and capped at 10 records per batch
 
-This is a technical dependency with no standalone UI — a consuming module must inherit the mixin, set `_isochrone_coordinate_fields`, and expose the recompute action in its own views (no such consuming module exists in this repository yet; see [Roadmap](#roadmap)).
+This is a technical dependency with no standalone UI — a consuming module must inherit the mixin, set `_isochrone_coordinate_fields`, and expose the recompute action in its own views (see [Related Add-ons](#related-add-ons)).
 
 ### Applications
 
@@ -192,15 +192,16 @@ Top-level application for multi-stop route planning — no Mapbox dependency. Pr
 
 ---
 
-## Roadmap
+## Related Add-ons
 
-The following modules are referenced by `route_planner` and `base_mapbox_gl_isochrone` as the intended consumers of those building blocks, but are **not yet part of this repository**:
+`route_planner` and `base_mapbox_gl_isochrone` are designed as building blocks for a further set of modules that extend them with map visualization, route optimization, and cross-app integrations. Those extensions are developed and maintained separately as commercial add-ons — they are **not part of this repository** and are not open source:
 
 - `route_planner_mapbox_gl` — Mapbox map visualization and API-based route calculation on top of `route_planner`
 - `contacts_route_planner_mapbox_gl` — create a route from contacts selected in the Contacts list/map view
 - `delivery_route_planner_mapbox_gl` — generate delivery routes from Inventory batch transfers
 - `website_route_planner_mapbox_gl` / `website_delivery_route_planner_mapbox_gl` — mobile-friendly driver portal
-- `fieldservice_dispatch_mapbox_gl` — matches field service orders to technicians using `base_mapbox_gl_isochrone`
+
+Interested in Route Planner with Mapbox? Contact [yopiangi@gmail.com](mailto:yopiangi@gmail.com).
 
 ---
 
